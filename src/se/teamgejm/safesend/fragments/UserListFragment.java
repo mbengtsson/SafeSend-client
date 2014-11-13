@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import se.teamgejm.safesend.R;
+import se.teamgejm.safesend.activities.SendMessageActivity;
 import se.teamgejm.safesend.entities.User;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -44,6 +46,9 @@ public class UserListFragment extends Fragment {
 			public void onItemClick(AdapterView<?> parent, View view, int pos,
 					long id) {
 				Log.i("MessageListFragment", users.get(pos) + " clicked");
+				Intent intent = new Intent(getActivity(), SendMessageActivity.class);
+				intent.putExtra("user", users.get(pos));
+				getActivity().startActivity(intent);
 			}
 		});
 	}

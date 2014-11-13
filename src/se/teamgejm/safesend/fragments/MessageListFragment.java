@@ -89,13 +89,13 @@ public class MessageListFragment extends Fragment {
 			currentItem = messages.get(position);
 			
 			TextView origin = (TextView) currentView.findViewById(R.id.message_item_origin);
-			origin.setText(getString(R.string.from) + currentItem.getOrigin());
+			origin.setText(getString(R.string.from) + " " + currentItem.getOrigin());
 			
 			TextView time = (TextView) currentView.findViewById(R.id.message_item_time);
 			time.setText(currentItem.getTimestamp());
 			
 			TextView type = (TextView) currentView.findViewById(R.id.message_item_type);
-			type.setText(getString(R.string.type) + currentItem.getMessageType().getNiceName());
+			type.setText(getString(R.string.type) + " " + currentItem.getMessageType().getNiceName());
 			
 			return currentView;
 		}

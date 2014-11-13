@@ -1,6 +1,9 @@
 package se.teamgejm.safesend.entities;
 
-public class User {
+import java.io.Serializable;
+
+@SuppressWarnings("serial")
+public class User implements Serializable {
 	
 	private long id;
 	private String username;
