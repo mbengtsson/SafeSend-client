@@ -47,7 +47,7 @@ public class UserListFragment extends Fragment {
 					long id) {
 				Log.i("MessageListFragment", users.get(pos) + " clicked");
 				Intent intent = new Intent(getActivity(), SendMessageActivity.class);
-				intent.putExtra("user", users.get(pos));
+				intent.putExtra(SendMessageActivity.INTENT_USER, users.get(pos));
 				getActivity().startActivity(intent);
 			}
 		});

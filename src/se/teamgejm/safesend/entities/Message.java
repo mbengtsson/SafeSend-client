@@ -1,11 +1,14 @@
 package se.teamgejm.safesend.entities;
 
+import java.io.Serializable;
+
 import se.teamgejm.safesend.enums.MessageType;
 
 
-public class Message {
+@SuppressWarnings("serial")
+public class Message implements Serializable {
 	
-	private String origin;
+	private User origin;
 	private String timestamp;
 	private MessageType messageType;
 	private String messageData;
@@ -14,17 +17,17 @@ public class Message {
 		
 	}
 	
-	public Message(String origin, String timestamp, MessageType messageType) {
+	public Message(User origin, String timestamp, MessageType messageType) {
 		setOrigin(origin);
 		setTimestamp(timestamp);
 		setMessageType(messageType);
 	}
 	
-	public String getOrigin() {
+	public User getOrigin() {
 		return origin;
 	}
 
-	public void setOrigin(String origin) {
+	public void setOrigin(User origin) {
 		this.origin = origin;
 	}
 

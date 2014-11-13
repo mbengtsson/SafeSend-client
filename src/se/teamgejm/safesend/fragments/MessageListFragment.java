@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import se.teamgejm.safesend.R;
+import se.teamgejm.safesend.activities.OpenMessageActivity;
 import se.teamgejm.safesend.entities.Message;
+import se.teamgejm.safesend.entities.User;
 import se.teamgejm.safesend.enums.MessageType;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,6 +48,9 @@ public class MessageListFragment extends Fragment {
 			public void onItemClick(AdapterView<?> parent, View view, int pos,
 					long id) {
 				Log.i("MessageListFragment", messages.get(pos) + " clicked");
+				Intent intent = new Intent(getActivity(), OpenMessageActivity.class);
+				intent.putExtra(OpenMessageActivity.INTENT_MESSAGE, messages.get(pos));
+				getActivity().startActivity(intent);
 			}
 		});
 	}
@@ -53,8 +59,8 @@ public class MessageListFragment extends Fragment {
 		
 		// Mocked messages, here we will fetch all messages from the server
 		
-		messages.add(new Message("Kalle", "28 okt 14:48", MessageType.TEXT));
-		messages.add(new Message("Eva", "27 okt 18:12", MessageType.TEXT));
+		messages.add(new Message(new User("Kalle"), "28 okt 14:48", MessageType.TEXT));
+		messages.add(new Message(new User("Eva"), "27 okt 18:12", MessageType.TEXT));
 	}
 	
 	private void populateList() {
@@ -89,7 +95,7 @@ public class MessageListFragment extends Fragment {
 			currentItem = messages.get(position);
 			
 			TextView origin = (TextView) currentView.findViewById(R.id.message_item_origin);
-			origin.setText(getString(R.string.from) + " " + currentItem.getOrigin());
+			origin.setText(getString(R.string.from) + " " + currentItem.getOrigin().getUsername());
 			
 			TextView time = (TextView) currentView.findViewById(R.id.message_item_time);
 			time.setText(currentItem.getTimestamp());

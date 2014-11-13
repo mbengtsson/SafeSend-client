@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 public class SendMessageActivity extends Activity {
 	
+	public static final String INTENT_USER = "user";
+	
 	private User user;
 	
     @Override
@@ -21,8 +23,8 @@ public class SendMessageActivity extends Activity {
         
         setOnClickListeners();
         
-        if (getIntent().hasExtra("user")) {
-        	setUser((User) getIntent().getSerializableExtra("user"));
+        if (getIntent().hasExtra(INTENT_USER)) {
+        	setUser((User) getIntent().getSerializableExtra(INTENT_USER));
         }
         
         TextView username = (TextView) findViewById(R.id.message_send_to);
@@ -31,7 +33,7 @@ public class SendMessageActivity extends Activity {
     }
     
     private void setOnClickListeners() {
-    	ImageButton sendBtn = (ImageButton) findViewById(R.id.message_send);
+    	ImageButton sendBtn = (ImageButton) findViewById(R.id.message_send_button);
     	sendBtn.setOnClickListener(new OnClickListener() {
 			
 			@Override
