@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import se.teamgejm.safesend.R;
-import se.teamgejm.safesend.fragments.MessagesListFragment;
+import se.teamgejm.safesend.fragments.MessageListFragment;
 import se.teamgejm.safesend.fragments.UserListFragment;
 import android.app.Activity;
 import android.app.Fragment;
@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
     private List<Fragment> getFragments() {
     	List<Fragment> fragments = new ArrayList<Fragment>();
     	fragments.add(new UserListFragment());
-    	fragments.add(new MessagesListFragment());
+    	fragments.add(new MessageListFragment());
     	return fragments;
     }
     
