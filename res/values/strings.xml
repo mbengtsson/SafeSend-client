@@ -6,11 +6,13 @@
     <string name="no_value"></string>
     <string name="button_encrypt">Encrypt and send</string>
     <string name="button_decrypt">Decrypt and open</string>
-    
+
     <string name="hint_send_message">Write something . . .</string>
-    
+
     <string name="from">From:</string>
     <string name="type">Type:</string>
     <string name="send_to">SafeSend to:</string>
+
+    <string name="icon_user">&#xf007;</string>
 
 </resources>

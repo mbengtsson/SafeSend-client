@@ -1,63 +1,62 @@
 package se.teamgejm.safesend.entities;
 
-import java.io.Serializable;
-
 import se.teamgejm.safesend.enums.MessageType;
 
+import java.io.Serializable;
 
-@SuppressWarnings("serial")
+
 public class Message implements Serializable {
-	
-	private User origin;
-	private String timestamp;
-	private MessageType messageType;
-	private String messageData;
 
-	public Message() {
-		
-	}
-	
-	public Message(User origin, String timestamp, MessageType messageType) {
-		setOrigin(origin);
-		setTimestamp(timestamp);
-		setMessageType(messageType);
-	}
-	
-	public User getOrigin() {
-		return origin;
-	}
+    private User origin;
+    private String timestamp;
+    private MessageType messageType;
+    private String messageData;
 
-	public void setOrigin(User origin) {
-		this.origin = origin;
-	}
+    public Message () {
 
-	public String getTimestamp() {
-		return timestamp;
-	}
+    }
 
-	public void setTimestamp(String timestamp) {
-		this.timestamp = timestamp;
-	}
+    public Message (User origin, String timestamp, MessageType messageType) {
+        setOrigin(origin);
+        setTimestamp(timestamp);
+        setMessageType(messageType);
+    }
 
-	public MessageType getMessageType() {
-		return messageType;
-	}
+    public User getOrigin () {
+        return origin;
+    }
 
-	public void setMessageType(MessageType messageType) {
-		this.messageType = messageType;
-	}
+    public void setOrigin (User origin) {
+        this.origin = origin;
+    }
 
-	public String getMessageData() {
-		return messageData;
-	}
+    public String getTimestamp () {
+        return timestamp;
+    }
 
-	public void setMessageData(String messageData) {
-		this.messageData = messageData;
-	}
+    public void setTimestamp (String timestamp) {
+        this.timestamp = timestamp;
+    }
 
-	@Override
-	public String toString() {
-		return "Origin: " + origin + " Timestamp: " + timestamp + " Msgtype: " + messageType.getNiceName();
-	}
+    public MessageType getMessageType () {
+        return messageType;
+    }
+
+    public void setMessageType (MessageType messageType) {
+        this.messageType = messageType;
+    }
+
+    public String getMessageData () {
+        return messageData;
+    }
+
+    public void setMessageData (String messageData) {
+        this.messageData = messageData;
+    }
+
+    @Override
+    public String toString () {
+        return "Origin: " + origin + " Timestamp: " + timestamp + " Msgtype: " + messageType.getNiceName();
+    }
 
 }
