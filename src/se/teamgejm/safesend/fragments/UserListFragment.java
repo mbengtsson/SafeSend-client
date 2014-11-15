@@ -1,6 +1,7 @@
 package se.teamgejm.safesend.fragments;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,13 +12,16 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import de.greenrobot.event.EventBus;
 import se.teamgejm.safesend.R;
+import se.teamgejm.safesend.activities.SendMessageActivity;
 import se.teamgejm.safesend.adapters.UserAdapter;
 import se.teamgejm.safesend.entities.User;
 import se.teamgejm.safesend.events.UserListFailedEvent;
 import se.teamgejm.safesend.events.UserListSuccessEvent;
-import se.teamgejm.safesend.rest.FetshUserList;
+import se.teamgejm.safesend.rest.FetchUserList;
 
 public class UserListFragment extends Fragment {
+
+    private final static String TAG = "UserListFragment";
 
     private UserAdapter adapter;
     private ListView userListView;
@@ -26,7 +30,7 @@ public class UserListFragment extends Fragment {
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        View view = inflater.inflate(R.layout.fragment_user_list, container, false);
+        final View view = inflater.inflate(R.layout.fragment_user_list, container, false);
         userListView = (ListView) view.findViewById(R.id.user_listview);
         setOnItemClickListeners();
 
@@ -71,17 +75,17 @@ public class UserListFragment extends Fragment {
 
             @Override
             public void onItemClick (AdapterView<?> parent, View view, int pos, long id) {
-                //                Log.i("MessageListFragment", users.get(pos) + " clicked");
-                //                Intent intent = new Intent(getActivity(), SendMessageActivity.class);
-                //                intent.putExtra(SendMessageActivity.INTENT_USER, users.get(pos));
-                //                getActivity().startActivity(intent);
+                final User user = adapter.getUser(pos);
+                final Intent intent = new Intent(getActivity(), SendMessageActivity.class);
+                intent.putExtra(SendMessageActivity.INTENT_USER, user);
+                getActivity().startActivity(intent);
             }
         });
     }
 
     private void startLoading () {
         userListProgressBar.setVisibility(View.VISIBLE);
-        FetshUserList.call();
+        FetchUserList.call();
     }
 
     private void stopLoading () {
