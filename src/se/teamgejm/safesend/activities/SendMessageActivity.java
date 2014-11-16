@@ -10,7 +10,7 @@ import android.widget.TextView;
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.entities.SendMessageRequest;
 import se.teamgejm.safesend.entities.User;
-import se.teamgejm.safesend.rest.SendMessage;
+import se.teamgejm.safesend.rest.FetchUserKey;
 
 public class SendMessageActivity extends Activity {
 
@@ -56,15 +56,18 @@ public class SendMessageActivity extends Activity {
         // Fetch the receivers pub key.
         Log.d(TAG, "Receiver : " + getReceiver().toString());
 
+        FetchUserKey.call(getReceiver().getId());
+
         // Encrypt the message.
         SendMessageRequest sendMessageRequest = new SendMessageRequest();
-        sendMessageRequest.setMessage(message.getText().toString());
-        sendMessageRequest.setPassword("password");
-        sendMessageRequest.setReceiverId(getReceiver().getId());
-        sendMessageRequest.setSenderId(1L);
+        //        sendMessageRequest.setMessage(message.getText().toString());
+        //        sendMessageRequest.setPassword("password");
+        //        sendMessageRequest.setReceiverId(getReceiver().getId());
+        //        sendMessageRequest.setSenderId(1L);
 
-        SendMessage.call(sendMessageRequest);
+
         // Send.
+        // SendMessage.call(sendMessageRequest);
     }
 
     public User getReceiver () {
