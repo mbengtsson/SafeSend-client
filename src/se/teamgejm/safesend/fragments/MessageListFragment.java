@@ -1,6 +1,5 @@
 package se.teamgejm.safesend.fragments;
 
-import de.greenrobot.event.EventBus;
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.adapters.MessageAdapter;
 import android.app.Fragment;
@@ -43,19 +42,6 @@ public class MessageListFragment extends Fragment {
 			}
 		});
 	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-        EventBus.getDefault().register(this);
-	}
-
-	@Override
-	public void onStop() {
-        EventBus.getDefault().unregister(this);
-		super.onStop();
-	}
-	
 	
 
 }
