@@ -1,6 +1,8 @@
 package se.teamgejm.safesend.entities;
 
-public class User implements Comparable<User> {
+import java.io.Serializable;
+
+public class User implements Comparable<User>, Serializable {
 
     private long id;
     private String username;

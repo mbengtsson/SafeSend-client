@@ -77,7 +77,7 @@ public class UserListFragment extends Fragment {
             public void onItemClick (AdapterView<?> parent, View view, int pos, long id) {
                 final User user = adapter.getUser(pos);
                 final Intent intent = new Intent(getActivity(), SendMessageActivity.class);
-                intent.putExtra(SendMessageActivity.INTENT_USER, user);
+                intent.putExtra(SendMessageActivity.INTENT_RECEIVER, user);
                 getActivity().startActivity(intent);
             }
         });

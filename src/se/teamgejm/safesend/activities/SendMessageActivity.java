@@ -1,59 +1,77 @@
 package se.teamgejm.safesend.activities;
 
-import se.teamgejm.safesend.R;
-import se.teamgejm.safesend.entities.User;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.TextView;
+import se.teamgejm.safesend.R;
+import se.teamgejm.safesend.entities.SendMessageRequest;
+import se.teamgejm.safesend.entities.User;
+import se.teamgejm.safesend.rest.SendMessage;
 
 public class SendMessageActivity extends Activity {
-	
-	public static final String INTENT_USER = "user";
-	
-	private User user;
-	
+
+    private final static String TAG = "SendMessageActivity";
+
+    public static final String INTENT_RECEIVER = "receiver";
+
+    private User receiver;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_message);
-        
+
         setOnClickListeners();
-        
-        if (getIntent().hasExtra(INTENT_USER)) {
-        	setUser((User) getIntent().getSerializableExtra(INTENT_USER));
+
+        if (getIntent().hasExtra(INTENT_RECEIVER)) {
+            setReceiver((User) getIntent().getSerializableExtra(INTENT_RECEIVER));
         }
-        
+
         TextView username = (TextView) findViewById(R.id.message_send_to);
-        username.setText(getString(R.string.send_to) + " " + getUser().getUsername());
-        
-    }
-    
-    private void setOnClickListeners() {
-    	ImageButton sendBtn = (ImageButton) findViewById(R.id.message_send_button);
-    	sendBtn.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Log.i("SendMessageActivity", "Send button clicked");
-				encryptAndSend();
-			}
-		});
-    }
-    
-    private void encryptAndSend() {
-    	// TODO sign and encrypt the message and send to server
+        username.setText(getString(R.string.message_to) + " " + getReceiver().getUsername());
+
     }
 
-	public User getUser() {
-		return user;
-	}
+    private void setOnClickListeners () {
+        Button sendBtn = (Button) findViewById(R.id.message_send_button);
+        sendBtn.setOnClickListener(new OnClickListener() {
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+            @Override
+            public void onClick (View v) {
+                Log.d(TAG, "Send button clicked");
+                encryptAndSend();
+            }
+        });
+    }
 
+    private void encryptAndSend () {
+        // TODO sign and encrypt the message and send to server
+        TextView message = (TextView) findViewById(R.id.message_text);
+        Log.d(TAG, "Message : " + message.getText().toString());
+
+        // Fetch the receivers pub key.
+        Log.d(TAG, "Receiver : " + getReceiver().toString());
+
+        // Encrypt the message.
+        SendMessageRequest sendMessageRequest = new SendMessageRequest();
+        sendMessageRequest.setMessage(message.getText().toString());
+        sendMessageRequest.setPassword("password");
+        sendMessageRequest.setReceiverId(getReceiver().getId());
+        sendMessageRequest.setSenderId(1L);
+
+        SendMessage.call(sendMessageRequest);
+        // Send.
+    }
+
+    public User getReceiver () {
+        return receiver;
+    }
+
+    public void setReceiver (User receiver) {
+        this.receiver = receiver;
+    }
 }
