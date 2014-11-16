@@ -18,10 +18,10 @@ public interface SafeSendService {
     @GET("/users")
     public void getUsers (Callback<List<User>> cb);
 
-    @GET("/user/{id}/pubkey")
+    @GET("/users/{id}/pubkey")
     public void getUserKey (@Path("id") long id, Callback<User> cb);
 
-    @POST("/message/send")
+    @POST("/messages/send")
     public void sendMessage (@Body SendMessageRequest message, Callback<String> cb);
 
 }
