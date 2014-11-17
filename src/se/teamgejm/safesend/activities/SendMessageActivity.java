@@ -1,12 +1,17 @@
 package se.teamgejm.safesend.activities;
 
+import java.io.IOException;
+
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.entities.User;
+import se.teamgejm.safesend.pgp.PgpHelper;
+import se.teamgejm.safesend.pgp.PgpUtils;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -45,7 +50,23 @@ public class SendMessageActivity extends Activity {
     }
     
     private void encryptAndSend() {
-    	// TODO sign and encrypt the message and send to server
+    	// Get the text from the user
+    	EditText text = (EditText) findViewById(R.id.message_text);
+    	String message = text.getText().toString();
+    	byte[] encryptedMessage = null;
+    	
+    	// TODO: Get the public key from the server
+    	
+    	try {
+    		// Encrypt the message using public key
+    		encryptedMessage = PgpHelper.getInstance().encryptWithPublicKey(message.getBytes(), PgpUtils.fileToString("pubKey.key", this));
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
+    	// TODO: Send encrypted message to server as string
     }
 
 	public User getUser() {
