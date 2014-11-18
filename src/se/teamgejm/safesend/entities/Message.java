@@ -2,10 +2,8 @@ package se.teamgejm.safesend.entities;
 
 import se.teamgejm.safesend.enums.MessageType;
 
-import java.io.Serializable;
 
-
-public class Message implements Serializable {
+public class Message {
 
     private User origin;
     private String timestamp;
