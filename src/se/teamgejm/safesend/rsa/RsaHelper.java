@@ -1,4 +1,4 @@
-package se.teamgejm.safesend.pgp;
+package se.teamgejm.safesend.rsa;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,18 +17,18 @@ import android.content.Context;
 import android.util.Base64;
 import android.util.Log;
 
-public class PgpHelper {
+public class RsaHelper {
 	
-private static PgpHelper INSTANCE = null;
+private static RsaHelper INSTANCE = null;
 	
-	public static PgpHelper getInstance() {
+	public static RsaHelper getInstance() {
 		if (INSTANCE == null) {
-			INSTANCE = new PgpHelper();
+			INSTANCE = new RsaHelper();
 		}
 		return INSTANCE;
 	}
 	
-	private PgpHelper() {
+	private RsaHelper() {
 		Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
 	}
 	
@@ -78,6 +78,13 @@ private static PgpHelper INSTANCE = null;
 		signature.initSign(Crypto.getRSAPrivateKeyFromString(privateKey)); 
 		signature.update(bytes); 
 		return signature.sign();
+	}
+	
+	public boolean verifyWithPublicKey(byte[] message, byte[] sign, String publicKey) throws Exception {
+		Signature signature = Signature.getInstance("SHA256withRSA", "SC"); 
+		signature.initVerify(Crypto.getRSAPublicKeyFromString(publicKey));
+		signature.update(message);
+		return signature.verify(sign);
 	}
 	
 	private KeyPair generateRSAKeyPair() throws Exception {

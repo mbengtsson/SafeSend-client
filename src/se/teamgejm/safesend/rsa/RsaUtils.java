@@ -1,4 +1,4 @@
-package se.teamgejm.safesend.pgp;
+package se.teamgejm.safesend.rsa;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import java.nio.charset.Charset;
 
 import android.content.Context;
 
-public class PgpUtils {
+public class RsaUtils {
 	
 	public static String keyToString(byte[] key) {
 		StringBuffer retString = new StringBuffer();

@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.entities.User;
-import se.teamgejm.safesend.pgp.PgpHelper;
-import se.teamgejm.safesend.pgp.PgpUtils;
+import se.teamgejm.safesend.rsa.RsaHelper;
+import se.teamgejm.safesend.rsa.RsaUtils;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
@@ -59,7 +59,7 @@ public class SendMessageActivity extends Activity {
     	
     	try {
     		// Encrypt the message using public key
-    		encryptedMessage = PgpHelper.getInstance().encryptWithPublicKey(message.getBytes(), PgpUtils.fileToString("pubKey.key", this));
+    		encryptedMessage = RsaHelper.getInstance().encryptWithPublicKey(message.getBytes(), RsaUtils.fileToString("pubKey.key", this));
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Exception e) {

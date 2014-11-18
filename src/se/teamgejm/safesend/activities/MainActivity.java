@@ -6,7 +6,7 @@ import java.util.List;
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.fragments.MessageListFragment;
 import se.teamgejm.safesend.fragments.UserListFragment;
-import se.teamgejm.safesend.pgp.PgpHelper;
+import se.teamgejm.safesend.rsa.RsaHelper;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -29,7 +29,7 @@ public class MainActivity extends Activity {
         getViewPager().setAdapter(getPagerAdapter());
         
         // Generate new keys at startup for testing purposes
-        PgpHelper.getInstance().createKeyPair(this);
+        RsaHelper.getInstance().createKeyPair(this);
         
     }
     

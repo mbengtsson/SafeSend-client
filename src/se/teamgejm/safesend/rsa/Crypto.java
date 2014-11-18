@@ -1,4 +1,4 @@
-package se.teamgejm.safesend.pgp;
+package se.teamgejm.safesend.rsa;
 
 import java.security.KeyFactory;
 import java.security.PrivateKey;
