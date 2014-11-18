@@ -22,5 +22,6 @@
     <string name="regsiter_nickname">Nickname</string>
     <string name="register_email">Email address</string>
     <string name="register_button_register">Register me</string>
+    <string name="register_title">Register new account</string>
 
 </resources>

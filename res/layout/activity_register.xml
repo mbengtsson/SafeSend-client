@@ -2,15 +2,20 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent" android:padding="16dp">
 
     <LinearLayout
             android:orientation="vertical"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
             android:id="@+id/register_form">
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="@string/register_title"
+                android:id="@+id/register_title"
+                android:gravity="center_horizontal"/>
         <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -36,15 +41,17 @@
                 android:hint="@string/register_password"
                 android:layout_marginTop="16dp"/>
         <Button
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/register_button_register"
-                android:id="@+id/register_button_register"/>
+                android:id="@+id/register_button_register"
+                android:layout_marginTop="16dp"/>
     </LinearLayout>
     <ProgressBar
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:id="@+id/regsiter_process_bar"/>
+            android:id="@+id/regsiter_process_bar"
+            android:visibility="gone"/>
 </RelativeLayout>

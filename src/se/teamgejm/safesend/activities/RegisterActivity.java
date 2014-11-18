@@ -25,7 +25,6 @@ public class RegisterActivity extends Activity {
         setContentView(R.layout.activity_register);
 
         progressBar = (ProgressBar) findViewById(R.id.regsiter_process_bar);
-        progressBar.setVisibility(View.GONE);
 
         registerForm = (LinearLayout) findViewById(R.id.register_form);
 
@@ -59,10 +58,11 @@ public class RegisterActivity extends Activity {
     public void onEvent (RegisterSuccessEvent event) {
         hideProgress();
         Toast.makeText(this, "Register success", Toast.LENGTH_LONG).show();
+        // TODO: Save something so we can use this to authenticate later and
+        // "login" the user.
     }
 
     private void registerUser () {
-
         final String username = ((TextView) findViewById(R.id.register_email)).getText().toString();
         final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
 
