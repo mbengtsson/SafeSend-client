@@ -13,6 +13,10 @@ import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.entities.User;
 import se.teamgejm.safesend.events.UserPubkeySuccessEvent;
 import se.teamgejm.safesend.rest.FetchUserKey;
+import se.teamgejm.safesend.rsa.RsaHelper;
+import se.teamgejm.safesend.rsa.RsaUtils;
+
+import java.io.IOException;
 
 public class SendMessageActivity extends Activity {
 
@@ -66,6 +70,7 @@ public class SendMessageActivity extends Activity {
         });
     }
 
+
     private void getReceiverPublicKey () {
         FetchUserKey.call(getReceiver().getId());
     }
@@ -79,6 +84,18 @@ public class SendMessageActivity extends Activity {
         // Fetch the receivers pub key.
         Log.d(TAG, "Receiver : " + getReceiver().toString());
 
+        byte[] encryptedMessage = null;
+
+        try {
+            // Encrypt the message using public key
+            encryptedMessage = RsaHelper.getInstance().encryptWithPublicKey(plainMessage.getBytes(), RsaUtils.fileToString("pubKey.key", this));
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Send the message.
         //        SendMessageRequest sendMessageRequest = new SendMessageRequest();

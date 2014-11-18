@@ -28,8 +28,7 @@ public class MainActivity extends Activity {
         getViewPager().setAdapter(getPagerAdapter());
 
         // Generate new keys at startup for testing purposes
-        //PgpHelper.getInstance().createKeyPair(this);
-
+        //RsaHelper.getInstance().createKeyPair(this);
     }
 
     private List<Fragment> getFragments () {
