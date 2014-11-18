@@ -7,6 +7,7 @@ import retrofit.http.POST;
 import retrofit.http.Path;
 import se.teamgejm.safesend.entities.SendMessageRequest;
 import se.teamgejm.safesend.entities.User;
+import se.teamgejm.safesend.entities.request.RegisterUserRequest;
 
 import java.util.List;
 
@@ -14,6 +15,9 @@ import java.util.List;
  * @author Emil Stjerneman
  */
 public interface SafeSendService {
+
+    @POST("/users")
+    public void registerUser (@Body RegisterUserRequest request, Callback<User> cb);
 
     @GET("/users")
     public void getUsers (Callback<List<User>> cb);
