@@ -11,7 +11,7 @@
 
     <string name="from">From:</string>
     <string name="type">Type:</string>
-    <string name="send_to">SafeSend to:</string>
+    <string name="message_to">Message to</string>
 
     <string name="icon_user">&#xf007;</string>
 

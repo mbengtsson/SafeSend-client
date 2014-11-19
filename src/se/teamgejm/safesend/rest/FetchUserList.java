@@ -14,9 +14,9 @@ import java.util.List;
 /**
  * @author Emil Stjerneman
  */
-public class FetshUserList {
+public class FetchUserList {
 
-    private final static String TAG = "FetshUserList";
+    private final static String TAG = "FetchUserList";
 
     /**
      * Callback to handle service results.
@@ -37,7 +37,7 @@ public class FetshUserList {
     };
 
     public static void call () {
-        ApiManager.getSafesendService().getUsers(FetshUserList.callback);
+        ApiManager.getSafesendService().getUsers(FetchUserList.callback);
     }
 
 }
