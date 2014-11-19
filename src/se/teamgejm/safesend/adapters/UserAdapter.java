@@ -96,7 +96,7 @@ public class UserAdapter extends BaseAdapter {
         final TextView icon = (TextView) convertView.findViewById(R.id.user_item_icon);
         icon.setTypeface(font);
 
-        holder.username.setText(user.getUsername());
+        holder.username.setText(user.getDisplayName());
 
         return convertView;
     }

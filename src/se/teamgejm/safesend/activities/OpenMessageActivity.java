@@ -28,7 +28,7 @@ public class OpenMessageActivity extends Activity {
         }
         
         TextView origin = (TextView) findViewById(R.id.message_origin);
-        origin.setText(getString(R.string.from) + " " + getMessage().getOrigin().getUsername());
+        origin.setText(getString(R.string.from) + " " + getMessage().getOrigin().getDisplayName());
         
         TextView time = (TextView) findViewById(R.id.message_time);
         time.setText(getMessage().getTimestamp());

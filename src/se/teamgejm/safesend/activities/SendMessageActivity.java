@@ -38,7 +38,7 @@ public class SendMessageActivity extends Activity {
         }
 
         TextView username = (TextView) findViewById(R.id.message_send_to);
-        username.setText(getString(R.string.message_to) + " " + getReceiver().getUsername());
+        username.setText(getString(R.string.message_to) + " " + getReceiver().getDisplayName());
     }
 
     @Override

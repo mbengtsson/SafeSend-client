@@ -29,8 +29,8 @@
         <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/register_nickname"
-                android:hint="@string/regsiter_nickname"
+                android:id="@+id/register_display_name"
+                android:hint="@string/regsiter_display_name"
                 android:layout_marginTop="16dp"/>
         <EditText
                 android:layout_width="match_parent"

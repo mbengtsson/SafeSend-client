@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.*;
 import de.greenrobot.event.EventBus;
 import se.teamgejm.safesend.R;
+import se.teamgejm.safesend.entities.CurrentUser;
 import se.teamgejm.safesend.entities.request.RegisterUserRequest;
 import se.teamgejm.safesend.events.RegisterFailedEvent;
 import se.teamgejm.safesend.events.RegisterSuccessEvent;
@@ -57,16 +58,21 @@ public class RegisterActivity extends Activity {
 
     public void onEvent (RegisterSuccessEvent event) {
         hideProgress();
-        Toast.makeText(this, "Register success", Toast.LENGTH_LONG).show();
-        // TODO: Save something so we can use this to authenticate later and
-        // "login" the user.
+
+        final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
+
+        CurrentUser currentUser = CurrentUser.getInstance();
+        currentUser.setEmail(event.getUser().getEmail());
+        currentUser.setDisplayName(event.getUser().getDisplayName());
+        currentUser.setPassword(password);
     }
 
     private void registerUser () {
-        final String username = ((TextView) findViewById(R.id.register_email)).getText().toString();
+        final String email = ((TextView) findViewById(R.id.register_email)).getText().toString();
+        final String displayName = ((TextView) findViewById(R.id.register_display_name)).getText().toString();
         final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
 
-        RegisterUser.call(new RegisterUserRequest(username, password, "test"));
+        RegisterUser.call(new RegisterUserRequest(email, displayName, password, "test"));
     }
 
     private void showProgress () {

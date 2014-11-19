@@ -5,15 +5,12 @@ import java.io.Serializable;
 public class User implements Comparable<User>, Serializable {
 
     private long id;
-    private String username;
+    private String email;
+    private String displayName;
     private String publicKey;
 
     public User () {
 
-    }
-
-    public User (String username) {
-        setUsername(username);
     }
 
     public long getId () {
@@ -24,12 +21,20 @@ public class User implements Comparable<User>, Serializable {
         this.id = id;
     }
 
-    public String getUsername () {
-        return username;
+    public String getEmail () {
+        return email;
     }
 
-    public void setUsername (String username) {
-        this.username = username;
+    public void setEmail (String email) {
+        this.email = email;
+    }
+
+    public String getDisplayName () {
+        return displayName;
+    }
+
+    public void setDisplayName (String displayName) {
+        this.displayName = displayName;
     }
 
     public String getPublicKey () {
@@ -41,36 +46,8 @@ public class User implements Comparable<User>, Serializable {
     }
 
     @Override
-    public String toString () {
-        return "User: " + username + ", id: " + id;
-    }
-
-    @Override
-    public boolean equals (Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || ((Object) this).getClass() != o.getClass()) {
-            return false;
-        }
-
-        User user = (User) o;
-
-        if (!username.equals(user.username)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode () {
-        return username.hashCode();
-    }
-
-
-    @Override
     public int compareTo (User another) {
-        return getUsername().compareToIgnoreCase(another.getUsername());
+        return getDisplayName().compareToIgnoreCase(another.getDisplayName());
     }
+
 }

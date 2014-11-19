@@ -114,7 +114,7 @@ public class MessageAdapter extends BaseAdapter {
         final TextView icon = (TextView) convertView.findViewById(R.id.user_item_icon);
         icon.setTypeface(font);
 
-        holder.username.setText(message.getOrigin().getUsername());
+        holder.username.setText(message.getOrigin().getDisplayName());
         holder.timestamp.setText(message.getTimestamp());
         holder.messageType.setText(message.getMessageType().getNiceName());
 

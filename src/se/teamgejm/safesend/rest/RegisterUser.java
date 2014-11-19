@@ -24,13 +24,13 @@ public class RegisterUser {
 
         @Override
         public void failure (final RetrofitError error) {
-            Log.d(TAG, "Failed to register user : " + error.getMessage());
+            Log.i(TAG, "Failed to register user : " + error.getMessage());
             EventBus.getDefault().post(new RegisterFailedEvent(error));
         }
 
         @Override
         public void success (final User user, final Response response) {
-            Log.d(TAG, "Successfully registered user.");
+            Log.i(TAG, "Successfully registered user.");
             EventBus.getDefault().post(new RegisterSuccessEvent(user));
         }
     };

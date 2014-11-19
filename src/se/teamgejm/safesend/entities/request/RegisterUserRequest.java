@@ -5,22 +5,32 @@ package se.teamgejm.safesend.entities.request;
  */
 public class RegisterUserRequest {
 
-    private String username;
+    private String email;
+    private String displayName;
     private String password;
     private String publicKey;
 
-    public RegisterUserRequest (String username, String password, String publicKey) {
-        setUsername(username);
+    public RegisterUserRequest (String email, String displayName, String password, String publicKey) {
+        setEmail(email);
+        setDisplayName(displayName);
         setPassword(password);
         setPublicKey(publicKey);
     }
 
-    public String getUsername () {
-        return username;
+    public String getEmail () {
+        return email;
     }
 
-    public void setUsername (String username) {
-        this.username = username;
+    public void setEmail (String email) {
+        this.email = email;
+    }
+
+    public String getDisplayName () {
+        return displayName;
+    }
+
+    public void setDisplayName (String displayName) {
+        this.displayName = displayName;
     }
 
     public String getPassword () {
