@@ -25,7 +25,7 @@ public class RegisterUser {
         @Override
         public void failure (final RetrofitError error) {
             Log.d(TAG, "Failed to register user : " + error.getMessage());
-            EventBus.getDefault().post(new RegisterFailedEvent());
+            EventBus.getDefault().post(new RegisterFailedEvent(error));
         }
 
         @Override

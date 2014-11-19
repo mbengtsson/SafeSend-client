@@ -52,7 +52,7 @@ public class RegisterActivity extends Activity {
 
     public void onEvent (RegisterFailedEvent event) {
         hideProgress();
-        Toast.makeText(this, "Register failed", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, event.getError().getMessage(), Toast.LENGTH_LONG).show();
     }
 
     public void onEvent (RegisterSuccessEvent event) {

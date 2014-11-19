@@ -26,7 +26,7 @@ public class FetchUserList {
         @Override
         public void failure (RetrofitError error) {
             Log.d(TAG, "Failed to load users : " + error.getMessage());
-            EventBus.getDefault().post(new UserListFailedEvent());
+            EventBus.getDefault().post(new UserListFailedEvent(error));
         }
 
         @Override
