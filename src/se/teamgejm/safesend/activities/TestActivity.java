@@ -1,35 +1,30 @@
 package se.teamgejm.safesend.activities;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
+import java.security.Security;
 
 import se.teamgejm.safesend.R;
-import se.teamgejm.safesend.rsa.RsaHelper;
-import se.teamgejm.safesend.rsa.RsaUtils;
+import se.teamgejm.safesend.pgp.PgpHelper;
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
 public class TestActivity extends Activity {
-	
-	private byte[] encryptedMessage = null;
-	private byte[] signature = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_test);
+		Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
 		
 		Button genKeys = (Button) findViewById(R.id.genKey);
 		genKeys.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				RsaHelper.getInstance().createKeyPair(v.getContext());
+				PgpHelper.generateKeyPair(v.getContext());
 			}
 		});
 		
@@ -38,22 +33,13 @@ public class TestActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
+				// Get the text from the user
 				EditText text = (EditText) findViewById(R.id.message);
-				byte[] message = text.getText().toString().getBytes();
-				
-				try {
-					encryptedMessage = RsaHelper.getInstance().encryptWithPublicKey(message, RsaUtils.fileToString("pubKey.key", v.getContext()));
-					signature = RsaHelper.getInstance().signWithPrivateKey(encryptedMessage, RsaUtils.fileToString("privKey.key", v.getContext()));
-					
-					String encMessage = new String(encryptedMessage, Charset.defaultCharset());
-					text.setText(encMessage);
-					Log.i("message-encrypted", encMessage);
-					
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-				
+				// Create a file of the message
+				PgpHelper.createMessage(v.getContext(), text.getText().toString());
+				// Sign and encrypt
+				String encryptedMessage = PgpHelper.signAndEncrypt(v.getContext());
+				text.setText(encryptedMessage);
 			}
 		});
 		
@@ -62,25 +48,10 @@ public class TestActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
+				// Decrypt and display the message
 				EditText text = (EditText) findViewById(R.id.message);
-
-				byte[] decryptedMessage = null;
-				
-				try {
-					if (RsaHelper.getInstance().verifyWithPublicKey(encryptedMessage, signature, RsaUtils.fileToString("pubKey.key", v.getContext()))) {
-						Log.i("MainActivity", "Verified");
-						decryptedMessage = RsaHelper.getInstance().decryptWithPrivateKey(encryptedMessage, RsaUtils.fileToString("privKey.key", v.getContext()));
-						String decMessage = new String(decryptedMessage, Charset.defaultCharset());
-						text.setText(decMessage);
-						Log.i("message-decrypted", decMessage);
-					} else {
-						Log.i("MainActivity", "Not verified");
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				String message = PgpHelper.decryptAndVerify(v.getContext());
+				text.setText(message);
 			}
 		});
 	}

@@ -1,8 +1,7 @@
-package se.teamgejm.safesend.rsa;
+package se.teamgejm.safesend.pgp;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +26,7 @@ import android.content.Context;
 
 public class PgpUtils {
 	
-	public static byte[] compressFile(Context context, String fileName, int algorithm) throws IOException
+	static byte[] compressFile(Context context, String fileName, int algorithm) throws IOException
     {
         ByteArrayOutputStream bOut = new ByteArrayOutputStream();
         PGPCompressedDataGenerator comData = new PGPCompressedDataGenerator(algorithm);
@@ -53,8 +52,7 @@ public class PgpUtils {
     {
         PGPSecretKey pgpSecKey = pgpSec.getSecretKey(keyID);
 
-        if (pgpSecKey == null)
-        {
+        if (pgpSecKey == null) {
             return null;
         }
 
@@ -88,18 +86,15 @@ public class PgpUtils {
         // world you would probably want to be a bit smarter about this.
         //
 
-        Iterator keyRingIter = pgpPub.getKeyRings();
-        while (keyRingIter.hasNext())
-        {
+        Iterator<?> keyRingIter = pgpPub.getKeyRings();
+        while (keyRingIter.hasNext()) {
             PGPPublicKeyRing keyRing = (PGPPublicKeyRing)keyRingIter.next();
 
-            Iterator keyIter = keyRing.getPublicKeys();
-            while (keyIter.hasNext())
-            {
+            Iterator<?> keyIter = keyRing.getPublicKeys();
+            while (keyIter.hasNext()) {
                 PGPPublicKey key = (PGPPublicKey)keyIter.next();
 
-                if (key.isEncryptionKey())
-                {
+                if (key.isEncryptionKey()) {
                     return key;
                 }
             }
@@ -135,18 +130,15 @@ public class PgpUtils {
         // world you would probably want to be a bit smarter about this.
         //
 
-        Iterator keyRingIter = pgpSec.getKeyRings();
-        while (keyRingIter.hasNext())
-        {
+        Iterator<?> keyRingIter = pgpSec.getKeyRings();
+        while (keyRingIter.hasNext()) {
             PGPSecretKeyRing keyRing = (PGPSecretKeyRing)keyRingIter.next();
 
-            Iterator keyIter = keyRing.getSecretKeys();
-            while (keyIter.hasNext())
-            {
+            Iterator<?> keyIter = keyRing.getSecretKeys();
+            while (keyIter.hasNext()) {
                 PGPSecretKey key = (PGPSecretKey)keyIter.next();
 
-                if (key.isSigningKey())
-                {
+                if (key.isSigningKey()) {
                     return key;
                 }
             }
