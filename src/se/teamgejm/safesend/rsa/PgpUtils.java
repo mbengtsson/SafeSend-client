@@ -1,29 +1,13 @@
 package se.teamgejm.safesend.rsa;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.NoSuchProviderException;
-import java.util.Iterator;
-
-import org.spongycastle.openpgp.PGPCompressedDataGenerator;
-import org.spongycastle.openpgp.PGPException;
-import org.spongycastle.openpgp.PGPLiteralData;
-import org.spongycastle.openpgp.PGPPrivateKey;
-import org.spongycastle.openpgp.PGPPublicKey;
-import org.spongycastle.openpgp.PGPPublicKeyRing;
-import org.spongycastle.openpgp.PGPPublicKeyRingCollection;
-import org.spongycastle.openpgp.PGPSecretKey;
-import org.spongycastle.openpgp.PGPSecretKeyRing;
-import org.spongycastle.openpgp.PGPSecretKeyRingCollection;
-import org.spongycastle.openpgp.PGPUtil;
+import android.content.Context;
+import org.spongycastle.openpgp.*;
 import org.spongycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
 import org.spongycastle.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
 
-import android.content.Context;
+import java.io.*;
+import java.security.NoSuchProviderException;
+import java.util.Iterator;
 
 public class PgpUtils {
 	
@@ -61,7 +45,7 @@ public class PgpUtils {
         return pgpSecKey.extractPrivateKey(new JcePBESecretKeyDecryptorBuilder().setProvider("BC").build(pass));
     }
 
-    static PGPPublicKey readPublicKey(Context context, String fileName) throws IOException, PGPException
+    public static PGPPublicKey readPublicKey(Context context, String fileName) throws IOException, PGPException
     {
         InputStream keyIn = context.openFileInput(fileName);
         PGPPublicKey pubKey = readPublicKey(keyIn);
