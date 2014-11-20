@@ -61,7 +61,7 @@ public class RegisterActivity extends Activity {
 
         final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
 
-        CurrentUser currentUser = CurrentUser.getInstance();
+        final CurrentUser currentUser = CurrentUser.getInstance();
         currentUser.setEmail(event.getUser().getEmail());
         currentUser.setDisplayName(event.getUser().getDisplayName());
         currentUser.setPassword(password);
