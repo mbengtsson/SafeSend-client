@@ -33,7 +33,9 @@ import org.spongycastle.util.io.Streams;
 import android.content.Context;
 import android.util.Log;
 
-public class PgpFileEncrypter {
+public class PgpFileProcessor {
+	
+	private static final String TAG = "PgpFileProcessor";
 	
 	public static void decryptFile(
 	        String inputFileName,
@@ -133,14 +135,14 @@ public class PgpFileEncrypter {
 	            if (pbe.isIntegrityProtected())
 	            {
 	                if (!pbe.verify()) {
-	                	Log.e("PgpFileEncrypter", "message failed integrity check");
+	                	Log.e(TAG, "message failed integrity check");
 	                }
 	                else {
-	                	Log.d("PgpFileEncrypter", "message integrity check passed");
+	                	Log.d(TAG, "message integrity check passed");
 	                }
 	            }
 	            else {
-                	Log.d("PgpFileEncrypter", "no message integrity check");
+                	Log.d(TAG, "no message integrity check");
 	            }
 	        }
 	        catch (PGPException e)

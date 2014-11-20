@@ -38,7 +38,9 @@ import org.spongycastle.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
 import android.content.Context;
 import android.util.Log;
 
-public class PgpFileSigner {
+public class PgpSignedFileProcessor {
+	
+	private static final String TAG = "PgpSignedFileProcessor";
 	
 	public static byte[] signPublicKey(PGPSecretKey secretKey, String secretKeyPass, PGPPublicKey keyToBeSigned,
 			String notationName, String notationValue) throws Exception {
@@ -149,9 +151,9 @@ public class PgpFileSigner {
 		PGPSignatureList p3 = (PGPSignatureList) pgpFact.nextObject();
 
 		if (ops.verify(p3.get(0))) {
-			Log.d("PgpFileSigner", "Correct signature.");
+			Log.d(TAG, "Correct signature.");
 		} else {
-			Log.d("PgpFileSigner", "Verification failed.");
+			Log.d(TAG, "Verification failed.");
 		}
 		
 		in.close();

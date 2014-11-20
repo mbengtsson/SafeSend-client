@@ -67,6 +67,8 @@ public class PgpHelper {
 	
 	private static Context context;
 	
+	private static final String TAG = "PgpHelper";
+	
 	public static void generateKeyPair(Context context) {
 		PgpHelper.context = context;
 
@@ -84,13 +86,13 @@ public class PgpHelper {
 		}
 	}
 	
-	public static void createMessage(Context context, String message) {
+	public static void createFile(Context context, String content, String fileName) {
 		PgpHelper.context = context;
 		
 		try {
-			OutputStream out = (PgpHelper.getContext().openFileOutput(MESSAGE_PLAINTEXT, Context.MODE_PRIVATE));
+			OutputStream out = (PgpHelper.getContext().openFileOutput(fileName, Context.MODE_PRIVATE));
 			
-			out.write(message.getBytes());
+			out.write(content.getBytes());
 	        
 			out.close();
 		} catch (IOException e1) {
@@ -104,30 +106,30 @@ public class PgpHelper {
 		String encryptedMessage = null;
 		
 		try {
-			Log.d("PgpHelper", "STARTING SIGNING PROCESS");
-			Log.d("PgpHelper", "Signing message...");
+			Log.d(TAG, "STARTING SIGNING PROCESS");
+			Log.d(TAG, "Signing message...");
 
 			File msg = new File(PgpHelper.getContext().getFilesDir(), MESSAGE_PLAINTEXT);
 			
 			FileOutputStream signedMessageStream = PgpHelper.getContext().openFileOutput(MESSAGE_SIGNED, Context.MODE_PRIVATE);
 			InputStream privKey = PgpHelper.getContext().openFileInput(KEY_PRIVATE);
-			PgpFileSigner.signFile(msg, privKey, signedMessageStream, PgpHelper.PASSWORD.toCharArray(), true);
+			PgpSignedFileProcessor.signFile(msg, privKey, signedMessageStream, PgpHelper.PASSWORD.toCharArray(), true);
 
-			Log.d("PgpHelper", "Message signed!");
-			Log.d("PgpHelper", "SIGNING PROCESS COMPLETE");
+			Log.d(TAG, "Message signed!");
+			Log.d(TAG, "SIGNING PROCESS COMPLETE");
 			
-			Log.d("PgpHelper", "STARTING ENCRYPTION PROCESS");
-			Log.d("PgpHelper", "Encrypting message...");
+			Log.d(TAG, "STARTING ENCRYPTION PROCESS");
+			Log.d(TAG, "Encrypting message...");
 			
-			PgpFileEncrypter.encryptFile(MESSAGE_ENCRYPTED, MESSAGE_SIGNED, KEY_PUBLIC, false, true);
+			PgpFileProcessor.encryptFile(MESSAGE_ENCRYPTED, MESSAGE_SIGNED, KEY_PUBLIC, false, true);
 			
-			Log.d("PgpHelper", "Signed message encrypted!");
-			Log.d("PgpHelper", "ENCRYPTION PROCESS COMPLETE");
+			Log.d(TAG, "Signed message encrypted!");
+			Log.d(TAG, "ENCRYPTION PROCESS COMPLETE");
 			
 			encryptedMessage = fileToString(MESSAGE_ENCRYPTED, PgpHelper.getContext());
 
 		} catch (Exception e) {
-			Log.e("PgpHelper", e.getMessage());
+			Log.e(TAG, e.getMessage());
 		}
 		
 		PgpHelper.getContext().deleteFile(MESSAGE_PLAINTEXT);
@@ -137,43 +139,44 @@ public class PgpHelper {
 	}
 	
 	public static String decryptAndVerify(Context context) {
+		PgpHelper.context = context;
 		
 		String message = null;
 
 		try {
-			Log.d("PgpHelper", "STARTING DECRYPTION PROCESS");
+			Log.d(TAG, "STARTING DECRYPTION PROCESS");
 			
-			PgpFileEncrypter.decryptFile(MESSAGE_ENCRYPTED, KEY_PRIVATE, PgpHelper.PASSWORD.toCharArray(), MESSAGE_DEFAULT_NAME);
+			PgpFileProcessor.decryptFile(MESSAGE_ENCRYPTED, KEY_PRIVATE, PgpHelper.PASSWORD.toCharArray(), MESSAGE_DEFAULT_NAME);
 
-			Log.d("PgpHelper", "DECRYPTION PROCESS COMPLETE");
+			Log.d(TAG, "DECRYPTION PROCESS COMPLETE");
 			
-			Log.d("PgpHelper", "STARTING VERIFICATION PROCESS");
-			Log.d("PgpHelper", "Signing senders public key...");
+			Log.d(TAG, "STARTING VERIFICATION PROCESS");
+			Log.d(TAG, "Signing senders public key...");
 			
 			PGPSecretKeyRing secRing = new PGPSecretKeyRing(PGPUtil.getDecoderStream(PgpHelper.getContext().openFileInput(KEY_PRIVATE)),
 					new JcaKeyFingerprintCalculator());
 			PGPPublicKeyRing pubRing = new PGPPublicKeyRing(PGPUtil.getDecoderStream(PgpHelper.getContext().openFileInput(KEY_PUBLIC)),
 					new JcaKeyFingerprintCalculator());
-			PGPPublicKeyRing signedRing = new PGPPublicKeyRing(new ByteArrayInputStream(PgpFileSigner.signPublicKey(secRing.getSecretKey(), PgpHelper.PASSWORD, pubRing.getPublicKey(), "Auto-signed", "Safe-Send")), new JcaKeyFingerprintCalculator());
+			PGPPublicKeyRing signedRing = new PGPPublicKeyRing(new ByteArrayInputStream(PgpSignedFileProcessor.signPublicKey(secRing.getSecretKey(), PgpHelper.PASSWORD, pubRing.getPublicKey(), "Auto-signed", "Safe-Send")), new JcaKeyFingerprintCalculator());
 
-			Log.d("PgpHelper", "Senders public key signed!");
+			Log.d(TAG, "Senders public key signed!");
 			
-			Log.d("PgpHelper", "Verifying signature...");
+			Log.d(TAG, "Verifying signature...");
 			
-			PgpFileSigner.verifyFile(MESSAGE_SIGNED, signedRing);
+			PgpSignedFileProcessor.verifyFile(MESSAGE_SIGNED, signedRing);
 
-			Log.d("PgpHelper", "Signature verified!");
-			Log.d("PgpHelper", "VERIFICATION PROCESS COMPLETE");
+			Log.d(TAG, "Signature verified!");
+			Log.d(TAG, "VERIFICATION PROCESS COMPLETE");
 			
 			message = fileToString(MESSAGE_PLAINTEXT, PgpHelper.getContext());
 		} catch (FileNotFoundException e) {
-			Log.e("PgpHelper", e.getMessage());
+			Log.e(TAG, e.getMessage());
 		} catch (IOException e) {
-			Log.e("PgpHelper", e.getMessage());
+			Log.e(TAG, e.getMessage());
 		} catch (PGPException e) {
-			Log.e("PgpHelper", e.getMessage());
+			Log.e(TAG, e.getMessage());
 		} catch (Exception e) {
-			Log.e("PgpHelper", e.getMessage());
+			Log.e(TAG, e.getMessage());
 		}
 		PgpHelper.getContext().deleteFile(MESSAGE_ENCRYPTED);
 		PgpHelper.getContext().deleteFile(MESSAGE_SIGNED);
