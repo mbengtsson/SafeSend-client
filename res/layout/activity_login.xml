@@ -4,52 +4,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" android:padding="16dp">
 
-    <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/login_form">
-
-        <EditText
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:ems="10"
-                android:id="@+id/login_email" android:layout_weight="1"
-                android:hint="@string/login_email"
-                />
-
-        <EditText
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:ems="10"
-                android:id="@+id/login_password" android:layout_weight="1"
-                android:hint="@string/login_password"
-                android:layout_marginTop="16dp"
-                />
-
-        <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/login_button_login"
-                android:id="@+id/login_button_login"
-                android:layout_marginTop="16dp"
-                />
-
-        <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/login_button_register"
-                android:id="@+id/login_button_register"
-                android:layout_marginTop="16dp"
-                />
-    </LinearLayout>
-    <ProgressBar
-            style="?android:attr/progressBarStyleLarge"
+    <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/login_process_bar" android:layout_below="@+id/login_form"
-            android:layout_centerHorizontal="true"
-            android:focusableInTouchMode="true" android:visibility="gone"/>
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/no_account"
+            android:id="@+id/no_account" android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"/>
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/login_button_register"
+            android:id="@+id/login_button_register"
+            android:layout_below="@+id/no_account"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="16dp"/>
 </RelativeLayout>

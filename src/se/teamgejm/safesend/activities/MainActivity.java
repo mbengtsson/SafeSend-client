@@ -26,9 +26,6 @@ public class MainActivity extends Activity {
         setPagerAdapter(new MyPagerAdapter(this.getFragmentManager(), getFragments()));
         setViewPager((ViewPager) findViewById(R.id.main_viewpager_layout));
         getViewPager().setAdapter(getPagerAdapter());
-
-        // Generate new keys at startup for testing purposes
-        //RsaHelper.getInstance().createKeyPair(this);
     }
 
     private List<Fragment> getFragments () {

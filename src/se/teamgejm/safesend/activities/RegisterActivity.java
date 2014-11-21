@@ -10,10 +10,11 @@ import org.spongycastle.openpgp.PGPException;
 import org.spongycastle.openpgp.PGPPublicKey;
 import org.spongycastle.util.encoders.Base64;
 import se.teamgejm.safesend.R;
-import se.teamgejm.safesend.entities.CurrentUser;
+import se.teamgejm.safesend.entities.UserCredentials;
 import se.teamgejm.safesend.entities.request.RegisterUserRequest;
 import se.teamgejm.safesend.events.RegisterFailedEvent;
 import se.teamgejm.safesend.events.RegisterSuccessEvent;
+import se.teamgejm.safesend.io.UserCredentialsHelper;
 import se.teamgejm.safesend.rest.RegisterUser;
 import se.teamgejm.safesend.rsa.PgpHelper;
 import se.teamgejm.safesend.rsa.PgpUtils;
@@ -71,10 +72,13 @@ public class RegisterActivity extends Activity {
 
         final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
 
-        final CurrentUser currentUser = CurrentUser.getInstance();
-        currentUser.setEmail(event.getUser().getEmail());
-        currentUser.setDisplayName(event.getUser().getDisplayName());
-        currentUser.setPassword(password);
+        final UserCredentials userCredentials = new UserCredentials();
+        userCredentials.setEmail(event.getUser().getEmail());
+        userCredentials.setDisplayName(event.getUser().getDisplayName());
+        userCredentials.setPassword(password);
+
+        UserCredentialsHelper.writeUserCredentials(getApplicationContext(), userCredentials);
+        this.finish();
     }
 
     private void registerUser () {

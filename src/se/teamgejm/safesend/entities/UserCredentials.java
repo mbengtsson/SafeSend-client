@@ -1,11 +1,15 @@
 package se.teamgejm.safesend.entities;
 
+import java.io.Serializable;
+
 /**
  * Created by anon on 11/19/14.
  */
-public class CurrentUser {
+public class UserCredentials implements Serializable {
 
-    private static CurrentUser currentUser;
+    private static final long serialVersionUID = 1L;
+
+    private long id;
 
     private String email;
 
@@ -13,16 +17,12 @@ public class CurrentUser {
 
     private String displayName;
 
-    public static CurrentUser getInstance() {
-        if (CurrentUser.currentUser == null) {
-            return new CurrentUser();
-        }
-
-        return CurrentUser.currentUser;
+    public long getId () {
+        return id;
     }
 
-    private CurrentUser () {
-        // No instance
+    public void setId (long id) {
+        this.id = id;
     }
 
     public String getEmail () {
@@ -47,14 +47,5 @@ public class CurrentUser {
 
     public void setDisplayName (String displayName) {
         this.displayName = displayName;
-    }
-
-    @Override
-    public String toString () {
-        return "CurrentUser{" +
-                "email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", displayName='" + displayName + '\'' +
-                '}';
     }
 }

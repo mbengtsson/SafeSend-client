@@ -17,11 +17,12 @@
     <string name="login_password">Password</string>
     <string name="login_email">Email address</string>
     <string name="login_button_login">Log in</string>
-    <string name="login_button_register">Register new account</string>
+    <string name="login_button_register">Register here</string>
     <string name="register_password">Password</string>
     <string name="regsiter_display_name">Name</string>
     <string name="register_email">Email address</string>
     <string name="register_button_register">Register me</string>
     <string name="register_title">Register new account</string>
+    <string name="no_account">No account yet?</string>
 
 </resources>
