@@ -17,19 +17,19 @@ import java.util.List;
  */
 public interface SafeSendService {
 
-    @POST("/users")
+    @POST("/api/users")
     public void registerUser (@Body RegisterUserRequest request, Callback<User> cb);
 
-    @GET("/users")
+    @GET("/api/users")
     public void getUsers (Callback<List<User>> cb);
 
-    @POST("/users/validate_credentials")
+    @POST("/api/users/validate_credentials")
     public void validateCredentials (@Body ValidateCredentialsRequest request, Callback<String> cb);
 
-    @GET("/users/{id}/pubkey")
+    @GET("/api/users/{id}/pubkey")
     public void getUserKey (@Path("id") long id, Callback<User> cb);
 
-    @POST("/messages/send")
+    @POST("/api/messages/send")
     public void sendMessage (@Body SendMessageRequest message, Callback<String> cb);
 
 }
