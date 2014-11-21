@@ -10,6 +10,7 @@ import org.spongycastle.openpgp.PGPException;
 import org.spongycastle.openpgp.PGPPublicKey;
 import org.spongycastle.util.encoders.Base64;
 import se.teamgejm.safesend.R;
+import se.teamgejm.safesend.SafeSendApplication;
 import se.teamgejm.safesend.entities.UserCredentials;
 import se.teamgejm.safesend.entities.request.RegisterUserRequest;
 import se.teamgejm.safesend.events.RegisterFailedEvent;
@@ -74,10 +75,16 @@ public class RegisterActivity extends Activity {
 
         final UserCredentials userCredentials = new UserCredentials();
         userCredentials.setEmail(event.getUser().getEmail());
-        userCredentials.setDisplayName(event.getUser().getDisplayName());
         userCredentials.setPassword(password);
 
-        UserCredentialsHelper.writeUserCredentials(getApplicationContext(), userCredentials);
+        // Save the credentials (not password) to a local file.
+        UserCredentialsHelper.getInstance().writeUserCredentials(getApplicationContext(), userCredentials);
+
+        final UserCredentials loadedUserCredentials = UserCredentialsHelper.getInstance().readUserCredentials(getApplicationContext());
+
+        SafeSendApplication.setCurrentUser(loadedUserCredentials);
+        SafeSendApplication.getCurrentUser().setPassword(password);
+
         this.finish();
     }
 
@@ -87,6 +94,7 @@ public class RegisterActivity extends Activity {
         final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
 
         // Generate public and private keys.
+        // TODO: Do this in another thread.
         PgpHelper.generateKeyPair(getApplicationContext(), email, password);
 
         try {

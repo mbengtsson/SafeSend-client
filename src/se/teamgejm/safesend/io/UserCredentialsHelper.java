@@ -12,13 +12,27 @@ public class UserCredentialsHelper {
 
     private final static String CREDENTIAL_FILE = "session";
 
+    private static UserCredentialsHelper userCredentialsHelper;
+
+    private UserCredentialsHelper () {
+        // No instace.
+    }
+
+    public static UserCredentialsHelper getInstance () {
+        if (userCredentialsHelper == null) {
+            return new UserCredentialsHelper();
+        }
+
+        return userCredentialsHelper;
+    }
+
     /**
      * Opens the credential file on the file system and returns the
      * UserCredentials object or null.
      *
      * @return a UserCredentials object or null.
      */
-    public static UserCredentials readUserCredentials (Context context) {
+    public UserCredentials readUserCredentials (Context context) {
         try {
             FileInputStream fis = context.openFileInput(CREDENTIAL_FILE);
             ObjectInputStream is = new ObjectInputStream(fis);
@@ -29,21 +43,24 @@ public class UserCredentialsHelper {
         }
         catch (ClassNotFoundException e) {
             e.printStackTrace();
+            return null;
         }
         catch (OptionalDataException e) {
             e.printStackTrace();
+            return null;
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
+            return null;
         }
         catch (StreamCorruptedException e) {
             e.printStackTrace();
+            return null;
         }
         catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
-
-        return null;
     }
 
     /**
@@ -52,7 +69,9 @@ public class UserCredentialsHelper {
      * @param userCredentials
      *         the UserCredentials object to save.
      */
-    public static void writeUserCredentials (Context context, UserCredentials userCredentials) {
+    public void writeUserCredentials (Context context, UserCredentials userCredentials) {
+        // Never save password.
+        userCredentials.setPassword(null);
         try {
             FileOutputStream fos = context.openFileOutput(CREDENTIAL_FILE, Context.MODE_PRIVATE);
             ObjectOutputStream os = new ObjectOutputStream(fos);

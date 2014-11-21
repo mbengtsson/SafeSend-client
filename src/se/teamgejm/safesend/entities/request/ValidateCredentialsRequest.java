@@ -1,17 +1,17 @@
-package se.teamgejm.safesend.entities;
-
-import java.io.Serializable;
+package se.teamgejm.safesend.entities.request;
 
 /**
- * Created by anon on 11/19/14.
+ * @author Emil Stjerneman
  */
-public class UserCredentials implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class ValidateCredentialsRequest {
 
     private String email;
-
     private String password;
+
+    public ValidateCredentialsRequest (String email, String password) {
+        setEmail(email);
+        setPassword(password);
+    }
 
     public String getEmail () {
         return email;
