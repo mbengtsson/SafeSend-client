@@ -6,8 +6,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.*;
 import de.greenrobot.event.EventBus;
-import org.spongycastle.openpgp.PGPException;
-import org.spongycastle.openpgp.PGPPublicKey;
 import org.spongycastle.util.encoders.Base64;
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.SafeSendApplication;
@@ -16,9 +14,8 @@ import se.teamgejm.safesend.entities.request.RegisterUserRequest;
 import se.teamgejm.safesend.events.RegisterFailedEvent;
 import se.teamgejm.safesend.events.RegisterSuccessEvent;
 import se.teamgejm.safesend.io.UserCredentialsHelper;
+import se.teamgejm.safesend.pgp.PgpHelper;
 import se.teamgejm.safesend.rest.RegisterUser;
-import se.teamgejm.safesend.rsa.PgpHelper;
-import se.teamgejm.safesend.rsa.PgpUtils;
 
 import java.io.IOException;
 
@@ -98,12 +95,11 @@ public class RegisterActivity extends Activity {
         PgpHelper.generateKeyPair(getApplicationContext(), email, password);
 
         try {
-            final PGPPublicKey pgpPublicKey = PgpUtils.readPublicKey(getApplicationContext(), "public.asc");
-            final byte[] encodedPubKey = pgpPublicKey.getEncoded();
-            final String base64PubKey = Base64.toBase64String(encodedPubKey);
+            final String pubkey = PgpHelper.fileToString(PgpHelper.KEY_PUBLIC, getApplicationContext());
+            final String base64PubKey = Base64.toBase64String(pubkey.getBytes());
             RegisterUser.call(new RegisterUserRequest(email, displayName, password, base64PubKey));
         }
-        catch (IOException | PGPException e) {
+        catch (IOException e) {
             hideProgress();
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
             Log.e(TAG, e.getMessage());
