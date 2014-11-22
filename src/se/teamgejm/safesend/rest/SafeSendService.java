@@ -9,6 +9,7 @@ import se.teamgejm.safesend.entities.SendMessageRequest;
 import se.teamgejm.safesend.entities.User;
 import se.teamgejm.safesend.entities.request.RegisterUserRequest;
 import se.teamgejm.safesend.entities.request.ValidateCredentialsRequest;
+import se.teamgejm.safesend.entities.response.UserResponse;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
 public interface SafeSendService {
 
     @POST("/api/users")
-    public void registerUser (@Body RegisterUserRequest request, Callback<User> cb);
+    public void registerUser (@Body RegisterUserRequest request, Callback<UserResponse> cb);
 
     @GET("/api/users")
     public void getUsers (Callback<List<User>> cb);

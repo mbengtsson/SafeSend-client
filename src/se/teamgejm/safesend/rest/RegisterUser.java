@@ -5,7 +5,6 @@ import de.greenrobot.event.EventBus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import se.teamgejm.safesend.entities.User;
 import se.teamgejm.safesend.entities.request.RegisterUserRequest;
 import se.teamgejm.safesend.entities.response.UserResponse;
 import se.teamgejm.safesend.events.RegisterFailedEvent;
@@ -21,7 +20,7 @@ public class RegisterUser {
     /**
      * Callback to handle service results.
      */
-    private final static Callback<User> CALLBACK = new Callback<User>() {
+    private final static Callback<UserResponse> CALLBACK = new Callback<UserResponse>() {
 
         @Override
         public void failure (final RetrofitError error) {

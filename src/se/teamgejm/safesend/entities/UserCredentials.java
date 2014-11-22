@@ -3,7 +3,9 @@ package se.teamgejm.safesend.entities;
 import java.io.Serializable;
 
 /**
- * Created by anon on 11/19/14.
+ * User credentials used to hold credentials.
+ *
+ * @author Emil Stjerneman
  */
 public class UserCredentials implements Serializable {
 

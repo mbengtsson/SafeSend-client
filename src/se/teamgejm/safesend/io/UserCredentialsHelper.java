@@ -1,14 +1,20 @@
 package se.teamgejm.safesend.io;
 
 import android.content.Context;
+import android.util.Log;
 import se.teamgejm.safesend.entities.UserCredentials;
 
 import java.io.*;
 
 /**
+ * Helper class to read and write to the session file stored locally on the
+ * device.
+ *
  * @author Emil Stjerneman
  */
 public class UserCredentialsHelper {
+
+    private final static String TAG = "UserCredentialsHelper";
 
     private final static String CREDENTIAL_FILE = "session";
 
@@ -33,33 +39,32 @@ public class UserCredentialsHelper {
      * @return a UserCredentials object or null.
      */
     public UserCredentials readUserCredentials (Context context) {
+        UserCredentials userCredentials = null;
         try {
             FileInputStream fis = context.openFileInput(CREDENTIAL_FILE);
             ObjectInputStream is = new ObjectInputStream(fis);
-            UserCredentials userCredentials = (UserCredentials) is.readObject();
+            userCredentials = (UserCredentials) is.readObject();
             is.close();
             fis.close();
             return userCredentials;
         }
         catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
+            Log.e(TAG, e.getMessage());
         }
         catch (OptionalDataException e) {
-            e.printStackTrace();
-            return null;
+            Log.e(TAG, e.getMessage());
         }
         catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
+            Log.e(TAG, e.getMessage());
         }
         catch (StreamCorruptedException e) {
-            e.printStackTrace();
-            return null;
+            Log.e(TAG, e.getMessage());
         }
         catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            Log.e(TAG, e.getMessage());
+        }
+        finally {
+            return userCredentials;
         }
     }
 
@@ -72,6 +77,7 @@ public class UserCredentialsHelper {
     public void writeUserCredentials (Context context, UserCredentials userCredentials) {
         // Never save password.
         userCredentials.setPassword(null);
+
         try {
             FileOutputStream fos = context.openFileOutput(CREDENTIAL_FILE, Context.MODE_PRIVATE);
             ObjectOutputStream os = new ObjectOutputStream(fos);
@@ -79,10 +85,10 @@ public class UserCredentialsHelper {
             os.close();
         }
         catch (FileNotFoundException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
         catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
     }
 }

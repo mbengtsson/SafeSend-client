@@ -60,14 +60,26 @@ public class RegisterActivity extends Activity {
         super.onStop();
     }
 
-    public void onEvent (RegisterFailedEvent event) {
+    /**
+     * Handle RegisterFailedEvent events.
+     *
+     * This will happen if the registration goes wrong.
+     */
+    public void onEvent (final RegisterFailedEvent event) {
         hideProgress();
+        // Just tell the user that something went wrong.
         Toast.makeText(this, event.getError().getMessage(), Toast.LENGTH_LONG).show();
     }
 
-    public void onEvent (RegisterSuccessEvent event) {
+    /**
+     * Handle RegisterSuccessEvent events.
+     *
+     * This will happen if the registration is successfully completed.
+     */
+    public void onEvent (final RegisterSuccessEvent event) {
         hideProgress();
 
+        // Get the password from the input field as its not returned by the server.
         final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
 
         final UserCredentials userCredentials = new UserCredentials();
@@ -77,10 +89,8 @@ public class RegisterActivity extends Activity {
         // Save the credentials (not password) to a local file.
         UserCredentialsHelper.getInstance().writeUserCredentials(getApplicationContext(), userCredentials);
 
-        final UserCredentials loadedUserCredentials = UserCredentialsHelper.getInstance().readUserCredentials(getApplicationContext());
-
-        SafeSendApplication.setCurrentUser(loadedUserCredentials);
-        SafeSendApplication.getCurrentUser().setPassword(password);
+        // Store the user credentials in the memory.
+        SafeSendApplication.setCurrentUser(userCredentials);
 
         this.finish();
     }
@@ -95,9 +105,8 @@ public class RegisterActivity extends Activity {
         PgpHelper.generateKeyPair(getApplicationContext(), email, password);
 
         try {
-            final String pubkey = PgpHelper.fileToString(PgpHelper.KEY_PUBLIC, getApplicationContext());
-            final String base64PubKey = Base64.toBase64String(pubkey.getBytes());
-            RegisterUser.call(new RegisterUserRequest(email, displayName, password, base64PubKey));
+            final String publicKey = PgpHelper.fileToString(PgpHelper.KEY_PUBLIC, getApplicationContext());
+            RegisterUser.call(new RegisterUserRequest(email, displayName, password, Base64.toBase64String(publicKey.getBytes())));
         }
         catch (IOException e) {
             hideProgress();
