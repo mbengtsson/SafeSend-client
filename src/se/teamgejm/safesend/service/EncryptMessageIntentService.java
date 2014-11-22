@@ -10,7 +10,7 @@ public class EncryptMessageIntentService extends IntentService {
 	public static final String MESSAGE_IN = "plain_text_message";
 	public static final String MESSAGE_OUT = "encrypted_message";
 	
-	private static final String TAG = "EncryptIntentService";
+	private static final String TAG = "EncryptMessageIntentService";
 
 	public EncryptMessageIntentService() {
 		super(TAG);
