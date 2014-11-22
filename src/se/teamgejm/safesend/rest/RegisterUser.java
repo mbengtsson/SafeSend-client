@@ -7,6 +7,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import se.teamgejm.safesend.entities.User;
 import se.teamgejm.safesend.entities.request.RegisterUserRequest;
+import se.teamgejm.safesend.entities.response.UserResponse;
 import se.teamgejm.safesend.events.RegisterFailedEvent;
 import se.teamgejm.safesend.events.RegisterSuccessEvent;
 
@@ -29,9 +30,9 @@ public class RegisterUser {
         }
 
         @Override
-        public void success (final User user, final Response response) {
+        public void success (final UserResponse userResponse, final Response response) {
             Log.i(TAG, "Successfully registered user.");
-            EventBus.getDefault().post(new RegisterSuccessEvent(user));
+            EventBus.getDefault().post(new RegisterSuccessEvent(userResponse));
         }
     };
 

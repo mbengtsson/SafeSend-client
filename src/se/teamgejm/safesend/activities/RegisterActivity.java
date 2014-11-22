@@ -71,7 +71,7 @@ public class RegisterActivity extends Activity {
         final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
 
         final UserCredentials userCredentials = new UserCredentials();
-        userCredentials.setEmail(event.getUser().getEmail());
+        userCredentials.setEmail(event.getUserResponse().getEmail());
         userCredentials.setPassword(password);
 
         // Save the credentials (not password) to a local file.

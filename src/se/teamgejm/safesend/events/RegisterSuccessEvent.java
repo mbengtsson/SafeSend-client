@@ -1,23 +1,24 @@
 package se.teamgejm.safesend.events;
 
-import se.teamgejm.safesend.entities.User;
+import se.teamgejm.safesend.entities.response.UserResponse;
 
 /**
+ * Event fired when a registration is complete.
+ *
  * @author Emil Stjerneman
  */
 public final class RegisterSuccessEvent {
 
-    private User user;
+    /**
+     * The REST response object.
+     */
+    private UserResponse userResponse;
 
-    public RegisterSuccessEvent (final User user) {
-        setUser(user);
+    public RegisterSuccessEvent (final UserResponse userResponse) {
+        this.userResponse = userResponse;
     }
 
-    public User getUser () {
-        return user;
-    }
-
-    public void setUser (final User user) {
-        this.user = user;
+    public UserResponse getUserResponse () {
+        return userResponse;
     }
 }
