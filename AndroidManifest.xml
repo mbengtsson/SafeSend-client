@@ -25,11 +25,6 @@
         <activity
                 android:name="se.teamgejm.safesend.activities.TestActivity"
                 android:label="Test">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
         <activity
                 android:name="se.teamgejm.safesend.activities.MainActivity"
