@@ -249,5 +249,23 @@ public class PgpHelper {
 
         return new String(b, Charset.defaultCharset());
     }
+    
+    public static byte[] fileToByteArray (String fileName, Context context) throws IOException {
+        File file = new File(context.getFilesDir(), fileName);
+        InputStream in = context.openFileInput(fileName);
+        byte[] b = new byte[(int) file.length()];
+        int len = b.length;
+        int total = 0;
+
+        while (total < len) {
+            int result = in.read(b, total, len - total);
+            if (result == -1) {
+                break;
+            }
+            total += result;
+        }
+
+        return b;
+    }
 
 }
