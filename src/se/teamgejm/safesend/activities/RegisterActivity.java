@@ -8,7 +8,6 @@ import android.widget.*;
 import de.greenrobot.event.EventBus;
 import org.spongycastle.util.encoders.Base64;
 import se.teamgejm.safesend.R;
-import se.teamgejm.safesend.SafeSendApplication;
 import se.teamgejm.safesend.entities.UserCredentials;
 import se.teamgejm.safesend.entities.request.RegisterUserRequest;
 import se.teamgejm.safesend.events.RegisterFailedEvent;
@@ -82,15 +81,11 @@ public class RegisterActivity extends Activity {
         // Get the password from the input field as its not returned by the server.
         final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
 
-        final UserCredentials userCredentials = new UserCredentials();
-        userCredentials.setEmail(event.getUserResponse().getEmail());
-        userCredentials.setPassword(password);
+        UserCredentials.getInstance().setEmail(event.getUserResponse().getEmail());
+        UserCredentials.getInstance().setPassword(password);
 
         // Save the credentials (not password) to a local file.
-        UserCredentialsHelper.getInstance().writeUserCredentials(getApplicationContext(), userCredentials);
-
-        // Store the user credentials in the memory.
-        SafeSendApplication.setCurrentUser(userCredentials);
+        UserCredentialsHelper.writeUserCredentials(getApplicationContext());
 
         this.finish();
     }

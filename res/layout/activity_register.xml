@@ -31,7 +31,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/register_display_name"
                 android:hint="@string/regsiter_display_name"
-                android:layout_marginTop="16dp"/>
+                android:layout_marginTop="16dp"
+                android:inputType="textEmailSubject"/>
         <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

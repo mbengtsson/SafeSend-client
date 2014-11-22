@@ -16,37 +16,20 @@ public class UserCredentialsHelper {
 
     private final static String TAG = "UserCredentialsHelper";
 
-    private final static String CREDENTIAL_FILE = "session";
-
-    private static UserCredentialsHelper userCredentialsHelper;
-
-    private UserCredentialsHelper () {
-        // No instace.
-    }
-
-    public static UserCredentialsHelper getInstance () {
-        if (userCredentialsHelper == null) {
-            return new UserCredentialsHelper();
-        }
-
-        return userCredentialsHelper;
-    }
+    public final static String CREDENTIAL_FILE = "session";
 
     /**
      * Opens the credential file on the file system and returns the
      * UserCredentials object or null.
-     *
-     * @return a UserCredentials object or null.
      */
-    public UserCredentials readUserCredentials (Context context) {
-        UserCredentials userCredentials = null;
+    public static void readUserCredentials (Context context) {
         try {
-            FileInputStream fis = context.openFileInput(CREDENTIAL_FILE);
+            FileInputStream fis = context.openFileInput(UserCredentialsHelper.CREDENTIAL_FILE);
             ObjectInputStream is = new ObjectInputStream(fis);
-            userCredentials = (UserCredentials) is.readObject();
+            UserCredentials userCredentials = (UserCredentials) is.readObject();
+            UserCredentials.getInstance().setEmail(userCredentials.getEmail());
             is.close();
             fis.close();
-            return userCredentials;
         }
         catch (ClassNotFoundException e) {
             Log.e(TAG, e.getMessage());
@@ -63,25 +46,16 @@ public class UserCredentialsHelper {
         catch (IOException e) {
             Log.e(TAG, e.getMessage());
         }
-        finally {
-            return userCredentials;
-        }
     }
 
     /**
      * Writes the UserCredentials object to a local file.
-     *
-     * @param userCredentials
-     *         the UserCredentials object to save.
      */
-    public void writeUserCredentials (Context context, UserCredentials userCredentials) {
-        // Never save password.
-        userCredentials.setPassword(null);
-
+    public static void writeUserCredentials (Context context) {
         try {
-            FileOutputStream fos = context.openFileOutput(CREDENTIAL_FILE, Context.MODE_PRIVATE);
+            FileOutputStream fos = context.openFileOutput(UserCredentialsHelper.CREDENTIAL_FILE, Context.MODE_PRIVATE);
             ObjectOutputStream os = new ObjectOutputStream(fos);
-            os.writeObject(userCredentials);
+            os.writeObject(UserCredentials.getInstance());
             os.close();
         }
         catch (FileNotFoundException e) {

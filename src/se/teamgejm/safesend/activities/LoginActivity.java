@@ -7,13 +7,14 @@ import android.view.View;
 import android.widget.*;
 import de.greenrobot.event.EventBus;
 import se.teamgejm.safesend.R;
-import se.teamgejm.safesend.SafeSendApplication;
 import se.teamgejm.safesend.entities.UserCredentials;
 import se.teamgejm.safesend.entities.request.ValidateCredentialsRequest;
 import se.teamgejm.safesend.events.UserCredentialsFailedEvent;
 import se.teamgejm.safesend.events.UserCredentialsSuccessEvent;
 import se.teamgejm.safesend.io.UserCredentialsHelper;
 import se.teamgejm.safesend.rest.ValidateCredentials;
+
+import java.util.Arrays;
 
 /**
  * @author Emil Stjerneman
@@ -53,35 +54,33 @@ public class LoginActivity extends Activity {
             @Override
             public void onClick (View view) {
                 showProgress();
-                ValidateCredentials.call(new ValidateCredentialsRequest(SafeSendApplication.getCurrentUser().getEmail(), passwordField.getText().toString()));
+                ValidateCredentials.call(new ValidateCredentialsRequest(UserCredentials.getInstance().getEmail(), passwordField.getText().toString()));
             }
         });
 
         progressBar = (ProgressBar) findViewById(R.id.login_progress_bar);
+
+        if (Arrays.asList(getApplicationContext().fileList()).contains(UserCredentialsHelper.CREDENTIAL_FILE)) {
+            UserCredentialsHelper.readUserCredentials(getApplicationContext());
+        }
     }
 
     @Override
     protected void onResume () {
         super.onResume();
 
-        if (SafeSendApplication.getCurrentUser() == null) {
-            final UserCredentials userCredentials = UserCredentialsHelper.getInstance().readUserCredentials(getApplicationContext());
-            SafeSendApplication.setCurrentUser(userCredentials);
-        }
-
-        // No email means that the user is not registered.
-        if (SafeSendApplication.getCurrentUser() == null) {
+        if (UserCredentials.getInstance().getEmail() == null) {
             // Showing register container by default.
         }
         // No password means that the user is not logged in.
-        else if (SafeSendApplication.getCurrentUser().getPassword() == null) {
+        else if (UserCredentials.getInstance().getPassword() == null) {
             registerContainer.setVisibility(View.GONE);
             loginContainer.setVisibility(View.VISIBLE);
         }
         // The user is registered and have a password.
         else {
             showProgress();
-            ValidateCredentials.call(new ValidateCredentialsRequest(SafeSendApplication.getCurrentUser().getEmail(), SafeSendApplication.getCurrentUser().getPassword()));
+            ValidateCredentials.call(new ValidateCredentialsRequest(UserCredentials.getInstance().getEmail(), UserCredentials.getInstance().getPassword()));
         }
     }
 
@@ -115,6 +114,7 @@ public class LoginActivity extends Activity {
     public void onEvent (final UserCredentialsFailedEvent event) {
         hideProgress();
         Toast.makeText(this, "Login failed.", Toast.LENGTH_LONG).show();
+        UserCredentials.getInstance().setPassword(null);
     }
 
     /**
@@ -123,11 +123,11 @@ public class LoginActivity extends Activity {
      * This will happen if the credentials were validated successfully.
      */
     public void onEvent (final UserCredentialsSuccessEvent event) {
-        SafeSendApplication.getCurrentUser().setPassword(passwordField.getText().toString());
+        if (UserCredentials.getInstance().getPassword() == null) {
+            UserCredentials.getInstance().setPassword(passwordField.getText().toString());
+        }
         final Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         this.finish();
     }
-
-
 }
