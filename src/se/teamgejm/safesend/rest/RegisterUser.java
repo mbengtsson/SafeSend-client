@@ -36,6 +36,6 @@ public class RegisterUser {
     };
 
     public static void call (final RegisterUserRequest request) {
-        ApiManager.getSafesendService().registerUser(request, RegisterUser.CALLBACK);
+        ApiManager.getSafesendServiceNoAuth().registerUser(request, RegisterUser.CALLBACK);
     }
 }

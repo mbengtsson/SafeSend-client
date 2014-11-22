@@ -14,18 +14,29 @@ import java.security.cert.X509Certificate;
  */
 public final class ApiManager {
 
-    private static final RestAdapter REST_ADAPTER = new RestAdapter.Builder()
+    private static final RestAdapter REST_ADAPTER_NO_AUTH = new RestAdapter.Builder()
+            .setEndpoint(SafeSendConstants.API_URI)
+            .setClient(new OkClient(ApiManager.getUnsafeOkHttpClient()))
+            .setLogLevel(RestAdapter.LogLevel.FULL)
+            .build();
+
+    private static final RestAdapter REST_ADAPTER_WITH_AUTH = new RestAdapter.Builder()
             .setEndpoint(SafeSendConstants.API_URI)
             .setClient(new OkClient(ApiManager.getUnsafeOkHttpClient()))
             .setLogLevel(RestAdapter.LogLevel.FULL)
                     //.setErrorHandler(new RestErrorHandler())
-                    //.setRequestInterceptor(new GroggboxRequestInterceptor())
+            .setRequestInterceptor(new SafeSendInterceptor())
             .build();
 
-    private static final SafeSendService SAFESEND_SERVICE = REST_ADAPTER.create(SafeSendService.class);
+    private static final SafeSendService SAFESEND_SERVICE_NO_AUTH = REST_ADAPTER_NO_AUTH.create(SafeSendService.class);
+    private static final SafeSendService SAFESEND_SERVICE = REST_ADAPTER_WITH_AUTH.create(SafeSendService.class);
 
     public static SafeSendService getSafesendService () {
         return SAFESEND_SERVICE;
+    }
+
+    public static SafeSendService getSafesendServiceNoAuth () {
+        return SAFESEND_SERVICE_NO_AUTH;
     }
 
     private static OkHttpClient getUnsafeOkHttpClient () {

@@ -35,6 +35,6 @@ public class ValidateCredentials {
     };
 
     public static void call (final ValidateCredentialsRequest request) {
-        ApiManager.getSafesendService().validateCredentials(request, ValidateCredentials.CALLBACK);
+        ApiManager.getSafesendServiceNoAuth().validateCredentials(request, ValidateCredentials.CALLBACK);
     }
 }
