@@ -19,6 +19,11 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+/**
+ * 
+ * @author Gustav
+ *
+ */
 public class OpenMessageActivity extends Activity {
 	
 	public static final String INTENT_MESSAGE = "message";
@@ -48,28 +53,29 @@ public class OpenMessageActivity extends Activity {
         
         TextView type = (TextView) findViewById(R.id.message_type);
         type.setText(getString(R.string.type) + " " + getMessage().getMessageType());
-        
-        IntentFilter filter = new IntentFilter(DecryptResponseReciever.ACTION_RESP);
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(new DecryptResponseReciever(), filter);
     }
 	
     public void onEvent (UserPubkeySuccessEvent event) {
     	// Recieve public key (this might change)
         getSender().setPublicKey(event.getPubkey());
-        Log.d(TAG, "Public key recieved: " + getSender().getPublicKey());
 
     	// Create a file of the public key
         PgpHelper.createFile(getApplicationContext(), getSender().getPublicKey(), PgpHelper.KEY_PUBLIC);
 
+        decryptAndVerify();
+    }
+    
+    /**
+     * Decrypt and verify the encrypted message
+     */
+    private void decryptAndVerify() {
     	// TODO: Get the encrypted message from the local database
-        String encryptedMessage = null;
+        final String encryptedMessage = null;
         
         // Start decrypt and verify
         Intent decryptIntent = new Intent(this, DecryptMessageIntentService.class);
         decryptIntent.putExtra(DecryptMessageIntentService.MESSAGE_IN, encryptedMessage);
         startService(decryptIntent);
-        
     }
 
 	private void setOnClickListeners() {
@@ -79,6 +85,9 @@ public class OpenMessageActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Log.i(TAG, "Open message button clicked");
+		        IntentFilter filter = new IntentFilter(DecryptMessageResponseReciever.ACTION_RESP);
+		        filter.addCategory(Intent.CATEGORY_DEFAULT);
+		        registerReceiver(new DecryptMessageResponseReciever(), filter);
 				getSenderPublicKey();
 			}
 		});
@@ -105,15 +114,22 @@ public class OpenMessageActivity extends Activity {
 		this.sender = sender;
 	}
 
-	public class DecryptResponseReciever extends BroadcastReceiver {
+    /**
+     * 
+     * @author Gustav
+     *
+     */
+	public class DecryptMessageResponseReciever extends BroadcastReceiver {
     	
-    	public static final String ACTION_RESP = "message_processed";
+    	public static final String ACTION_RESP = "se.teamgejm.intent.action.MESSAGE_PROCESSED";
 
     	@Override
     	public void onReceive(Context context, Intent intent) {
     		final String message = intent.getStringExtra(DecryptMessageIntentService.MESSAGE_OUT);
+    		Log.d(TAG, "Decrypted message:" + message);
     		
-    		//Show message and save to local database
+    		//TODO: Show message and save to local database
+			unregisterReceiver(this);
     	}
 
     }	

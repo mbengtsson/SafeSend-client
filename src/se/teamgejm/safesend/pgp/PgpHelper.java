@@ -1,23 +1,52 @@
 package se.teamgejm.safesend.pgp;
 
-import android.content.Context;
-import android.util.Log;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.Security;
+import java.security.SignatureException;
+import java.util.Date;
+
 import org.spongycastle.bcpg.ArmoredOutputStream;
 import org.spongycastle.bcpg.HashAlgorithmTags;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.jce.spec.ElGamalParameterSpec;
-import org.spongycastle.openpgp.*;
+import org.spongycastle.openpgp.PGPEncryptedData;
+import org.spongycastle.openpgp.PGPException;
+import org.spongycastle.openpgp.PGPKeyPair;
+import org.spongycastle.openpgp.PGPKeyRingGenerator;
+import org.spongycastle.openpgp.PGPPublicKey;
+import org.spongycastle.openpgp.PGPPublicKeyRing;
+import org.spongycastle.openpgp.PGPSecretKeyRing;
+import org.spongycastle.openpgp.PGPSignature;
 import org.spongycastle.openpgp.PGPUtil;
 import org.spongycastle.openpgp.operator.PGPDigestCalculator;
-import org.spongycastle.openpgp.operator.jcajce.*;
-import se.teamgejm.safesend.SafeSendApplication;
+import org.spongycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
+import org.spongycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
+import org.spongycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBuilder;
+import org.spongycastle.openpgp.operator.jcajce.JcaPGPKeyPair;
+import org.spongycastle.openpgp.operator.jcajce.JcePBESecretKeyEncryptorBuilder;
 
-import java.io.*;
-import java.math.BigInteger;
-import java.nio.charset.Charset;
-import java.security.*;
-import java.util.Date;
+import se.teamgejm.safesend.entities.UserCredentials;
+import android.content.Context;
+import android.util.Log;
 
+/**
+ * 
+ * @author Gustav
+ *
+ */
 public class PgpHelper {
 
     public static final String MESSAGE_PLAINTEXT = "message.txt";
@@ -94,7 +123,7 @@ public class PgpHelper {
 
             FileOutputStream signedMessageStream = PgpHelper.getContext().openFileOutput(MESSAGE_SIGNED, Context.MODE_PRIVATE);
             InputStream privKey = PgpHelper.getContext().openFileInput(KEY_PRIVATE);
-            PgpSignedFileProcessor.signFile(msg, privKey, signedMessageStream, SafeSendApplication.getCurrentUser().getPassword().toCharArray(), true);
+            PgpSignedFileProcessor.signFile(msg, privKey, signedMessageStream, UserCredentials.getInstance().getPassword().toCharArray(), true);
 
             Log.d(TAG, "Message signed!");
             Log.d(TAG, "SIGNING PROCESS COMPLETE");
@@ -128,7 +157,7 @@ public class PgpHelper {
         try {
             Log.d(TAG, "STARTING DECRYPTION PROCESS");
 
-            PgpFileProcessor.decryptFile(MESSAGE_ENCRYPTED, KEY_PRIVATE, SafeSendApplication.getCurrentUser().getPassword().toCharArray(), MESSAGE_DEFAULT_NAME);
+            PgpFileProcessor.decryptFile(MESSAGE_ENCRYPTED, KEY_PRIVATE, UserCredentials.getInstance().getPassword().toCharArray(), MESSAGE_DEFAULT_NAME);
 
             Log.d(TAG, "DECRYPTION PROCESS COMPLETE");
 
@@ -139,7 +168,7 @@ public class PgpHelper {
                     new JcaKeyFingerprintCalculator());
             PGPPublicKeyRing pubRing = new PGPPublicKeyRing(PGPUtil.getDecoderStream(PgpHelper.getContext().openFileInput(KEY_PUBLIC)),
                     new JcaKeyFingerprintCalculator());
-            PGPPublicKeyRing signedRing = new PGPPublicKeyRing(new ByteArrayInputStream(PgpSignedFileProcessor.signPublicKey(secRing.getSecretKey(), SafeSendApplication.getCurrentUser().getPassword(), pubRing.getPublicKey(), "Auto-signed", "Safe-Send")), new JcaKeyFingerprintCalculator());
+            PGPPublicKeyRing signedRing = new PGPPublicKeyRing(new ByteArrayInputStream(PgpSignedFileProcessor.signPublicKey(secRing.getSecretKey(), UserCredentials.getInstance().getPassword(), pubRing.getPublicKey(), "Auto-signed", "Safe-Send")), new JcaKeyFingerprintCalculator());
 
             Log.d(TAG, "Senders public key signed!");
 

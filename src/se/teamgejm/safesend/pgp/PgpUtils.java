@@ -9,6 +9,11 @@ import java.io.*;
 import java.security.NoSuchProviderException;
 import java.util.Iterator;
 
+/**
+ * 
+ * @author Gustav
+ *
+ */
 public class PgpUtils {
 
     static byte[] compressFile (Context context, String fileName, int algorithm) throws IOException {

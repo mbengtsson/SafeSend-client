@@ -38,6 +38,11 @@ import org.spongycastle.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
 import android.content.Context;
 import android.util.Log;
 
+/**
+ * 
+ * @author Gustav
+ *
+ */
 public class PgpSignedFileProcessor {
 	
 	private static final String TAG = "PgpSignedFileProcessor";

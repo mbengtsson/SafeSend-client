@@ -20,6 +20,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import de.greenrobot.event.EventBus;
 
+/**
+ * 
+ * @author Gustav
+ *
+ */
 public class SendMessageActivity extends Activity {
 
     private final static String TAG = "SendMessageActivity";
@@ -41,10 +46,6 @@ public class SendMessageActivity extends Activity {
 
         TextView username = (TextView) findViewById(R.id.message_send_to);
         username.setText(getString(R.string.message_to) + " " + getReceiver().getDisplayName());
-        
-        IntentFilter filter = new IntentFilter(EncryptResponseReciever.ACTION_RESP);
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(new EncryptResponseReciever(), filter);
     }
 
     @Override
@@ -62,16 +63,22 @@ public class SendMessageActivity extends Activity {
     public void onEvent (UserPubkeySuccessEvent event) {
     	// Recieve public key
         getReceiver().setPublicKey(event.getPubkey());
-        Log.d(TAG, "Public key recieved: " + getReceiver().getPublicKey());
 
     	// Create a file of the public key
         PgpHelper.createFile(getApplicationContext(), getReceiver().getPublicKey(), PgpHelper.KEY_PUBLIC);
         
-        TextView messageView = (TextView) findViewById(R.id.message_text);
+        signAndEncrypt();
+    }
+    
+    /**
+     * Sign and encrypt the message
+     */
+    private void signAndEncrypt() {
+    	TextView messageView = (TextView) findViewById(R.id.message_text);
         final String plainMessage = messageView.getText().toString();
         
         Log.d(TAG, "Message : " + plainMessage);
-
+        
     	// Start sign and encrypt
         Intent encryptIntent = new Intent(this, EncryptMessageIntentService.class);
         encryptIntent.putExtra(EncryptMessageIntentService.MESSAGE_IN, plainMessage);
@@ -85,6 +92,9 @@ public class SendMessageActivity extends Activity {
             @Override
             public void onClick (View v) {
                 Log.d(TAG, "Send button clicked");
+                IntentFilter filter = new IntentFilter(EncryptMessageResponseReciever.ACTION_RESP);
+                filter.addCategory(Intent.CATEGORY_DEFAULT);
+                registerReceiver(new EncryptMessageResponseReciever(), filter);
                 getReceiverPublicKey();
             }
         });
@@ -104,21 +114,29 @@ public class SendMessageActivity extends Activity {
         this.receiver = receiver;
     }
     
-    public class EncryptResponseReciever extends BroadcastReceiver {
+    /**
+     * 
+     * @author Gustav
+     *
+     */
+    public class EncryptMessageResponseReciever extends BroadcastReceiver {
     	
-    	public static final String ACTION_RESP = "message_processed";
+    	public static final String ACTION_RESP = "se.teamgejm.intent.action.MESSAGE_PROCESSED";
 
     	@Override
     	public void onReceive(Context context, Intent intent) {
     		final String encryptedMessage = intent.getStringExtra(EncryptMessageIntentService.MESSAGE_OUT);
+    		Log.d(TAG, "Encrypted message:" + encryptedMessage);
     		
-    		// Send the message.
+    		// TODO: Send the message.
             //        SendMessageRequest sendMessageRequest = new SendMessageRequest();
             //        sendMessageRequest.setMessage();
             //        sendMessageRequest.setPassword("password");
             //        sendMessageRequest.setReceiverId(getReceiver().getId());
             //        sendMessageRequest.setSenderId(1L);
             //        SendMessage.call(sendMessageRequest);
+    		
+    		unregisterReceiver(this);
     	}
 
     }	

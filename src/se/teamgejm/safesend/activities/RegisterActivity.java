@@ -1,6 +1,10 @@
 package se.teamgejm.safesend.activities;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,6 +12,7 @@ import android.widget.*;
 import de.greenrobot.event.EventBus;
 import org.spongycastle.util.encoders.Base64;
 import se.teamgejm.safesend.R;
+import se.teamgejm.safesend.activities.OpenMessageActivity.DecryptMessageResponseReciever;
 import se.teamgejm.safesend.entities.UserCredentials;
 import se.teamgejm.safesend.entities.request.RegisterUserRequest;
 import se.teamgejm.safesend.events.RegisterFailedEvent;
@@ -15,8 +20,12 @@ import se.teamgejm.safesend.events.RegisterSuccessEvent;
 import se.teamgejm.safesend.io.UserCredentialsHelper;
 import se.teamgejm.safesend.pgp.PgpHelper;
 import se.teamgejm.safesend.rest.RegisterUser;
+import se.teamgejm.safesend.service.DecryptMessageIntentService;
+import se.teamgejm.safesend.service.EncryptMessageIntentService;
+import se.teamgejm.safesend.service.GenerateKeysIntentService;
 
 import java.io.IOException;
+import java.security.Security;
 
 /**
  * @author Emil Stjerneman
@@ -32,6 +41,7 @@ public class RegisterActivity extends Activity {
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
 
         progressBar = (ProgressBar) findViewById(R.id.regsiter_process_bar);
 
@@ -41,8 +51,11 @@ public class RegisterActivity extends Activity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick (View view) {
+                IntentFilter filter = new IntentFilter(GenerateKeysResponseReciever.ACTION_RESP);
+                filter.addCategory(Intent.CATEGORY_DEFAULT);
+                registerReceiver(new GenerateKeysResponseReciever(), filter);
                 showProgress();
-                registerUser();
+                generateKeyPairs();
             }
         });
     }
@@ -90,24 +103,22 @@ public class RegisterActivity extends Activity {
         this.finish();
     }
 
-    private void registerUser () {
+    private void generateKeyPairs () {
         final String email = ((TextView) findViewById(R.id.register_email)).getText().toString();
-        final String displayName = ((TextView) findViewById(R.id.register_display_name)).getText().toString();
         final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
-
-        // Generate public and private keys.
-        // TODO: Do this in another thread.
-        PgpHelper.generateKeyPair(getApplicationContext(), email, password);
-
-        try {
-            final String publicKey = PgpHelper.fileToString(PgpHelper.KEY_PUBLIC, getApplicationContext());
-            RegisterUser.call(new RegisterUserRequest(email, displayName, password, Base64.toBase64String(publicKey.getBytes())));
-        }
-        catch (IOException e) {
-            hideProgress();
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-            Log.e(TAG, e.getMessage());
-        }
+        
+        Intent genKeyIntent = new Intent(this, GenerateKeysIntentService.class);
+        genKeyIntent.putExtra(GenerateKeysIntentService.EXTRA_EMAIL, email);
+        genKeyIntent.putExtra(GenerateKeysIntentService.EXTRA_PWD, password);
+        startService(genKeyIntent);
+    }
+    
+    private void registerUser(String publicKey) {
+    	final String displayName = ((TextView) findViewById(R.id.register_display_name)).getText().toString();
+        final String email = ((TextView) findViewById(R.id.register_email)).getText().toString();
+        final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
+		
+		RegisterUser.call(new RegisterUserRequest(email, displayName, password, Base64.toBase64String(publicKey.getBytes())));
     }
 
     private void showProgress () {
@@ -118,5 +129,23 @@ public class RegisterActivity extends Activity {
     private void hideProgress () {
         progressBar.setVisibility(View.GONE);
         registerForm.setVisibility(View.VISIBLE);
+    }
+    
+    /**
+     * 
+     * @author Gustav
+     *
+     */
+    public class GenerateKeysResponseReciever extends BroadcastReceiver {
+    	
+    	public static final String ACTION_RESP = "se.teamgejm.intent.action.MESSAGE_PROCESSED";
+
+    	@Override
+    	public void onReceive(Context context, Intent intent) {
+			final String publicKey = intent.getStringExtra(GenerateKeysIntentService.PUBLIC_KEY);
+			registerUser(publicKey);
+			unregisterReceiver(this);
+    	}
+
     }
 }

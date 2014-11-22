@@ -10,9 +10,15 @@ import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.fragments.MessageListFragment;
 import se.teamgejm.safesend.fragments.UserListFragment;
 
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 
+ * @author Gustav
+ *
+ */
 public class MainActivity extends Activity {
 
     private ViewPager viewPager;
@@ -22,6 +28,7 @@ public class MainActivity extends Activity {
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
 
         setPagerAdapter(new MyPagerAdapter(this.getFragmentManager(), getFragments()));
         setViewPager((ViewPager) findViewById(R.id.main_viewpager_layout));

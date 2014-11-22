@@ -33,6 +33,11 @@ import org.spongycastle.util.io.Streams;
 import android.content.Context;
 import android.util.Log;
 
+/**
+ * 
+ * @author Gustav
+ *
+ */
 public class PgpFileProcessor {
 	
 	private static final String TAG = "PgpFileProcessor";
