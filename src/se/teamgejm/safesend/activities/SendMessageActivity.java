@@ -4,8 +4,14 @@ package se.teamgejm.safesend.activities;
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.entities.User;
 import se.teamgejm.safesend.events.UserPubkeySuccessEvent;
+import se.teamgejm.safesend.pgp.PgpHelper;
 import se.teamgejm.safesend.rest.FetchUserKey;
+import se.teamgejm.safesend.service.EncryptMessageIntentService;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -35,6 +41,10 @@ public class SendMessageActivity extends Activity {
 
         TextView username = (TextView) findViewById(R.id.message_send_to);
         username.setText(getString(R.string.message_to) + " " + getReceiver().getDisplayName());
+        
+        IntentFilter filter = new IntentFilter(EncryptResponseReciever.ACTION_RESP);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(new EncryptResponseReciever(), filter);
     }
 
     @Override
@@ -50,8 +60,22 @@ public class SendMessageActivity extends Activity {
     }
 
     public void onEvent (UserPubkeySuccessEvent event) {
+    	// Recieve public key
         getReceiver().setPublicKey(event.getPubkey());
-        encryptAndSend();
+        Log.d(TAG, "Public key recieved: " + getReceiver().getPublicKey());
+
+    	// Create a file of the public key
+        PgpHelper.createFile(getApplicationContext(), getReceiver().getPublicKey(), PgpHelper.KEY_PUBLIC);
+        
+        TextView messageView = (TextView) findViewById(R.id.message_text);
+        final String plainMessage = messageView.getText().toString();
+        
+        Log.d(TAG, "Message : " + plainMessage);
+
+    	// Start sign and encrypt
+        Intent encryptIntent = new Intent(this, EncryptMessageIntentService.class);
+        encryptIntent.putExtra(EncryptMessageIntentService.MESSAGE_IN, plainMessage);
+        startService(encryptIntent);
     }
 
     private void setOnClickListeners () {
@@ -68,25 +92,8 @@ public class SendMessageActivity extends Activity {
 
 
     private void getReceiverPublicKey () {
+        Log.d(TAG, "Getting public key");
         FetchUserKey.call(getReceiver().getId());
-    }
-
-    private void encryptAndSend () {
-        // TODO sign and encrypt the message and send to server
-        TextView messageView = (TextView) findViewById(R.id.message_text);
-        String plainMessage = messageView.getText().toString();
-        Log.d(TAG, "Message : " + plainMessage);
-
-        // Fetch the receivers pub key.
-        Log.d(TAG, "Receiver : " + getReceiver().toString());
-
-        // Send the message.
-        //        SendMessageRequest sendMessageRequest = new SendMessageRequest();
-        //        sendMessageRequest.setMessage();
-        //        sendMessageRequest.setPassword("password");
-        //        sendMessageRequest.setReceiverId(getReceiver().getId());
-        //        sendMessageRequest.setSenderId(1L);
-        //        SendMessage.call(sendMessageRequest);
     }
 
     private User getReceiver () {
@@ -96,4 +103,23 @@ public class SendMessageActivity extends Activity {
     private void setReceiver (User receiver) {
         this.receiver = receiver;
     }
+    
+    public class EncryptResponseReciever extends BroadcastReceiver {
+    	
+    	public static final String ACTION_RESP = "message_processed";
+
+    	@Override
+    	public void onReceive(Context context, Intent intent) {
+    		final String encryptedMessage = intent.getStringExtra(EncryptMessageIntentService.MESSAGE_OUT);
+    		
+    		// Send the message.
+            //        SendMessageRequest sendMessageRequest = new SendMessageRequest();
+            //        sendMessageRequest.setMessage();
+            //        sendMessageRequest.setPassword("password");
+            //        sendMessageRequest.setReceiverId(getReceiver().getId());
+            //        sendMessageRequest.setSenderId(1L);
+            //        SendMessage.call(sendMessageRequest);
+    	}
+
+    }	
 }
