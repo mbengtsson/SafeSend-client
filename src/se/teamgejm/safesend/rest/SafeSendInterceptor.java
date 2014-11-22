@@ -14,7 +14,7 @@ public class SafeSendInterceptor implements RequestInterceptor {
         final String email = SafeSendApplication.getCurrentUser().getEmail();
         final String password = SafeSendApplication.getCurrentUser().getPassword();
         final String auth = email + ":" + password;
-        System.out.println(authpass);
+
         requestFacade.addHeader("Authorization", "Basic " + Base64.encodeToString(auth.getBytes(), Base64.DEFAULT));
     }
 }
