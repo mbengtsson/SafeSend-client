@@ -1,12 +1,6 @@
 package se.teamgejm.safesend.activities;
 
 
-import se.teamgejm.safesend.R;
-import se.teamgejm.safesend.entities.User;
-import se.teamgejm.safesend.events.UserPubkeySuccessEvent;
-import se.teamgejm.safesend.pgp.PgpHelper;
-import se.teamgejm.safesend.rest.FetchUserKey;
-import se.teamgejm.safesend.service.EncryptMessageIntentService;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,11 +13,17 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 import de.greenrobot.event.EventBus;
+import se.teamgejm.safesend.R;
+import se.teamgejm.safesend.database.dao.DbMessageDao;
+import se.teamgejm.safesend.database.model.DbMessage;
+import se.teamgejm.safesend.entities.User;
+import se.teamgejm.safesend.events.UserPubkeySuccessEvent;
+import se.teamgejm.safesend.pgp.PgpHelper;
+import se.teamgejm.safesend.rest.FetchUserKey;
+import se.teamgejm.safesend.service.EncryptMessageIntentService;
 
 /**
- * 
  * @author Gustav
- *
  */
 public class SendMessageActivity extends Activity {
 
@@ -32,6 +32,8 @@ public class SendMessageActivity extends Activity {
     public static final String INTENT_RECEIVER = "receiver";
 
     private User receiver;
+
+    private DbMessageDao dbMessageDao;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -46,6 +48,9 @@ public class SendMessageActivity extends Activity {
 
         TextView username = (TextView) findViewById(R.id.message_send_to);
         username.setText(getString(R.string.message_to) + " " + getReceiver().getDisplayName());
+
+        dbMessageDao = new DbMessageDao(this);
+        dbMessageDao.open();
     }
 
     @Override
@@ -61,25 +66,31 @@ public class SendMessageActivity extends Activity {
     }
 
     public void onEvent (UserPubkeySuccessEvent event) {
-    	// Recieve public key
+        // Recieve public key
         getReceiver().setPublicKey(event.getPubkey());
 
-    	// Create a file of the public key
+        // Create a file of the public key
         PgpHelper.createFile(getApplicationContext(), getReceiver().getPublicKey(), PgpHelper.KEY_PUBLIC);
-        
+
         signAndEncrypt();
     }
-    
+
     /**
      * Sign and encrypt the message
      */
-    private void signAndEncrypt() {
-    	TextView messageView = (TextView) findViewById(R.id.message_text);
+    private void signAndEncrypt () {
+        TextView messageView = (TextView) findViewById(R.id.message_text);
         final String plainMessage = messageView.getText().toString();
-        
+
         Log.d(TAG, "Message : " + plainMessage);
-        
-    	// Start sign and encrypt
+
+        final DbMessage dbMessage = new DbMessage();
+        dbMessage.setMessage(plainMessage);
+        final DbMessage dbMessage1 = dbMessageDao.addMessage(dbMessage);
+
+        Log.d(TAG, "SQLite Message : " + dbMessage1.toString());
+
+        // Start sign and encrypt
         Intent encryptIntent = new Intent(this, EncryptMessageIntentService.class);
         encryptIntent.putExtra(EncryptMessageIntentService.MESSAGE_IN, plainMessage);
         startService(encryptIntent);
@@ -113,31 +124,29 @@ public class SendMessageActivity extends Activity {
     private void setReceiver (User receiver) {
         this.receiver = receiver;
     }
-    
+
     /**
-     * 
      * @author Gustav
-     *
      */
     public class EncryptMessageResponseReciever extends BroadcastReceiver {
-    	
-    	public static final String ACTION_RESP = "se.teamgejm.intent.action.MESSAGE_PROCESSED";
 
-    	@Override
-    	public void onReceive(Context context, Intent intent) {
-    		final String encryptedMessage = intent.getStringExtra(EncryptMessageIntentService.MESSAGE_OUT);
-    		Log.d(TAG, "Encrypted message:" + encryptedMessage);
-    		
-    		// TODO: Send the message.
+        public static final String ACTION_RESP = "se.teamgejm.intent.action.MESSAGE_PROCESSED";
+
+        @Override
+        public void onReceive (Context context, Intent intent) {
+            final String encryptedMessage = intent.getStringExtra(EncryptMessageIntentService.MESSAGE_OUT);
+            Log.d(TAG, "Encrypted message:" + encryptedMessage);
+
+            // TODO: Send the message.
             //        SendMessageRequest sendMessageRequest = new SendMessageRequest();
             //        sendMessageRequest.setMessage();
             //        sendMessageRequest.setPassword("password");
             //        sendMessageRequest.setReceiverId(getReceiver().getId());
             //        sendMessageRequest.setSenderId(1L);
             //        SendMessage.call(sendMessageRequest);
-    		
-    		unregisterReceiver(this);
-    	}
 
-    }	
+            unregisterReceiver(this);
+        }
+
+    }
 }
