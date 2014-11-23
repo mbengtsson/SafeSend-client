@@ -3,6 +3,7 @@ package se.teamgejm.safesend.activities;
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.entities.Message;
 import se.teamgejm.safesend.entities.User;
+import se.teamgejm.safesend.events.UserPubkeyFailedEvent;
 import se.teamgejm.safesend.events.UserPubkeySuccessEvent;
 import se.teamgejm.safesend.pgp.PgpHelper;
 import se.teamgejm.safesend.rest.FetchUserKey;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * 
@@ -85,12 +87,16 @@ public class OpenMessageActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Log.i(TAG, "Open message button clicked");
-		        IntentFilter filter = new IntentFilter(DecryptMessageResponseReciever.ACTION_RESP);
-		        filter.addCategory(Intent.CATEGORY_DEFAULT);
-		        registerReceiver(new DecryptMessageResponseReciever(), filter);
+				registerResponseReciever();
 				getSenderPublicKey();
 			}
 		});
+	}
+	
+	private void registerResponseReciever() {
+		IntentFilter filter = new IntentFilter(DecryptMessageResponseReciever.ACTION_RESP);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(new DecryptMessageResponseReciever(), filter);
 	}
 	
     private void getSenderPublicKey () {
@@ -125,11 +131,11 @@ public class OpenMessageActivity extends Activity {
 
     	@Override
     	public void onReceive(Context context, Intent intent) {
+			unregisterReceiver(this);
     		final String message = intent.getStringExtra(DecryptMessageIntentService.MESSAGE_OUT);
     		Log.d(TAG, "Decrypted message:" + message);
     		
     		//TODO: Show message and save to local database
-			unregisterReceiver(this);
     	}
 
     }	
