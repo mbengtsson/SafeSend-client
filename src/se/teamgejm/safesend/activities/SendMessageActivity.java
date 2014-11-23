@@ -41,6 +41,7 @@ public class SendMessageActivity extends Activity {
     private ProgressBar progressBar;
     private RelativeLayout sendForm;
     private TextView statusMessage;
+	private String message;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -95,21 +96,13 @@ public class SendMessageActivity extends Activity {
      */
     private void signAndEncrypt() {
         statusMessage.setText(R.string.status_encrypting);
-    	TextView messageView = (TextView) findViewById(R.id.message_text);
-        final String plainMessage = messageView.getText().toString();
         
-        Log.d(TAG, "Message : " + plainMessage);
-        
-        if (plainMessage.isEmpty()) {
-        	Toast.makeText(getApplicationContext(), getString(R.string.empty_message) , Toast.LENGTH_SHORT).show();
-        	hideProgress();
-        	return;
-        }
+        Log.d(TAG, "Message : " + message);
         
         registerResponseReciever();
         
         Intent encryptIntent = new Intent(this, EncryptMessageIntentService.class);
-        encryptIntent.putExtra(EncryptMessageIntentService.MESSAGE_IN, plainMessage);
+        encryptIntent.putExtra(EncryptMessageIntentService.MESSAGE_IN, message);
         startService(encryptIntent);
     }
 
@@ -120,6 +113,12 @@ public class SendMessageActivity extends Activity {
             @Override
             public void onClick (View v) {
                 Log.d(TAG, "Send button clicked");
+                final TextView text = (TextView) findViewById(R.id.message_text);
+                message = text.getText().toString();
+                if (message.isEmpty()) {
+                	Toast.makeText(getApplicationContext(), getString(R.string.empty_message) , Toast.LENGTH_SHORT).show();
+                	return;
+                }
                 showProgress();
                 getReceiverPublicKey();
             }
@@ -170,10 +169,10 @@ public class SendMessageActivity extends Activity {
     	@Override
     	public void onReceive(Context context, Intent intent) {
     		unregisterReceiver(this);
-    		final String encryptedMessage = intent.getStringExtra(EncryptMessageIntentService.MESSAGE_OUT);
+    		String encryptedMessage = intent.getStringExtra(EncryptMessageIntentService.MESSAGE_OUT);
     		Log.d(TAG, "Encrypted message:" + encryptedMessage);
     		
-    		if (encryptedMessage.isEmpty()) {
+    		if (encryptedMessage == null) {
     			Toast.makeText(getApplicationContext(), getString(R.string.failed_encryption) , Toast.LENGTH_SHORT).show();
     			hideProgress();
             	return;
