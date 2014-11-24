@@ -1,39 +1,47 @@
 package se.teamgejm.safesend.entities;
 
+import java.io.Serializable;
+
 import se.teamgejm.safesend.enums.MessageType;
 
+/**
+ * 
+ * @author Gustav
+ *
+ */
+@SuppressWarnings("serial")
+public class Message implements Serializable {
 
-public class Message {
-
-    private User origin;
-    private String timestamp;
+	private long messageId;
+    private User sender;
+    private long timeStamp;
     private MessageType messageType;
     private String messageData;
 
     public Message () {
-
+    	setMessageType(MessageType.TEXT);
     }
 
-    public Message (User origin, String timestamp, MessageType messageType) {
-        setOrigin(origin);
-        setTimestamp(timestamp);
-        setMessageType(messageType);
+    public Message (User sender, long timeStamp) {
+    	this();
+        setSender(sender);
+        setTimeStamp(timeStamp);
     }
 
-    public User getOrigin () {
-        return origin;
+    public User getSender () {
+        return sender;
     }
 
-    public void setOrigin (User origin) {
-        this.origin = origin;
+    public void setSender (User origin) {
+        this.sender = origin;
     }
 
-    public String getTimestamp () {
-        return timestamp;
+    public long getTimeStamp () {
+        return timeStamp;
     }
 
-    public void setTimestamp (String timestamp) {
-        this.timestamp = timestamp;
+    public void setTimeStamp (long timestamp) {
+        this.timeStamp = timestamp;
     }
 
     public MessageType getMessageType () {
@@ -52,9 +60,17 @@ public class Message {
         this.messageData = messageData;
     }
 
+	public long getMessageId() {
+		return messageId;
+	}
+
+	public void setMessageId(long messageId) {
+		this.messageId = messageId;
+	}
+
     @Override
     public String toString () {
-        return "Origin: " + origin + " Timestamp: " + timestamp + " Msgtype: " + messageType.getNiceName();
+        return "Sender: " + sender + " Timestamp: " + timeStamp + " Msgtype: " + messageType.getNiceName();
     }
 
 }

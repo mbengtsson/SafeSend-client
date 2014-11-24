@@ -5,6 +5,7 @@ import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.Path;
+import se.teamgejm.safesend.entities.Message;
 import se.teamgejm.safesend.entities.User;
 import se.teamgejm.safesend.entities.request.RegisterUserRequest;
 import se.teamgejm.safesend.entities.request.SendMessageRequest;
@@ -32,5 +33,8 @@ public interface SafeSendService {
 
     @POST("/api/messages")
     public void sendMessage (@Body SendMessageRequest message, Callback<String> cb);
+    
+    @GET("/api/messages")
+    public void getMessages (Callback<List<Message>> cb);
 
 }

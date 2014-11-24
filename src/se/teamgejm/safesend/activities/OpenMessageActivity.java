@@ -1,5 +1,8 @@
 package se.teamgejm.safesend.activities;
 
+import java.text.DateFormat;
+import java.util.Date;
+
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.entities.Message;
 import se.teamgejm.safesend.entities.User;
@@ -48,10 +51,12 @@ public class OpenMessageActivity extends Activity {
         }
         
         TextView origin = (TextView) findViewById(R.id.message_origin);
-        origin.setText(getString(R.string.from) + " " + getMessage().getOrigin().getDisplayName());
+        origin.setText(getString(R.string.from) + " " + getMessage().getSender().getDisplayName());
+        
+        Date date = new Date(getMessage().getTimeStamp());
         
         TextView time = (TextView) findViewById(R.id.message_time);
-        time.setText(getMessage().getTimestamp());
+        time.setText(DateFormat.getDateInstance().format(date));
         
         TextView type = (TextView) findViewById(R.id.message_type);
         type.setText(getString(R.string.type) + " " + getMessage().getMessageType());

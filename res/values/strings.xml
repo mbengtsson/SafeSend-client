@@ -6,6 +6,7 @@
     <string name="no_value"></string>
     <string name="button_encrypt">Encrypt and send</string>
     <string name="button_decrypt">Decrypt and open</string>
+    <string name="button_update_messages">Update . . .</string>
 
     <string name="hint_send_message">Write something . . .</string>
 
@@ -13,9 +14,11 @@
     <string name="type">Type:</string>
     <string name="message_to">Message to</string>
     <string name="empty_message">You can\'t send a empty message.</string>
+    
     <string name="failed_pub_key">Failed to get the receivers public key.</string>
     <string name="failed_encryption">Failed to encrypt the message.</string>
     <string name="failed_send_message">Failed to send the message.</string>
+    <string name="failed_message_list">Failed to load latest messages.</string>
     
     <string name="success_send_message">Message sent.</string>
     
