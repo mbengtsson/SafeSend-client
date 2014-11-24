@@ -7,10 +7,14 @@ import org.spongycastle.util.encoders.Base64;
 
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.entities.User;
+import se.teamgejm.safesend.entities.request.SendMessageRequest;
+import se.teamgejm.safesend.events.SendMessageFailedEvent;
+import se.teamgejm.safesend.events.SendMessageSuccessEvent;
 import se.teamgejm.safesend.events.UserPubkeyFailedEvent;
 import se.teamgejm.safesend.events.UserPubkeySuccessEvent;
 import se.teamgejm.safesend.pgp.PgpHelper;
 import se.teamgejm.safesend.rest.FetchUserKey;
+import se.teamgejm.safesend.rest.SendMessage;
 import se.teamgejm.safesend.service.EncryptMessageIntentService;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -94,6 +98,18 @@ public class SendMessageActivity extends Activity {
     
     public void onEvent(UserPubkeyFailedEvent event) {
     	Toast.makeText(getApplicationContext(), getString(R.string.failed_pub_key) , Toast.LENGTH_SHORT).show();
+    	hideProgress();
+    }
+    
+    public void onEvent(SendMessageSuccessEvent event) {
+    	Toast.makeText(getApplicationContext(), getString(R.string.success_send_message), Toast.LENGTH_SHORT).show();
+    	getApplicationContext().deleteFile(PgpHelper.MESSAGE_ENCRYPTED);
+    	hideProgress();
+    }
+    
+    public void onEvent(SendMessageFailedEvent event) {
+    	Toast.makeText(getApplicationContext(), getString(R.string.failed_send_message), Toast.LENGTH_SHORT).show();
+    	getApplicationContext().deleteFile(PgpHelper.MESSAGE_ENCRYPTED);
     	hideProgress();
     }
     
@@ -185,14 +201,11 @@ public class SendMessageActivity extends Activity {
     		}
 
             statusMessage.setText(R.string.status_sending);
-    		
-    		// TODO: Send the message.
-            //        SendMessageRequest sendMessageRequest = new SendMessageRequest();
-            //        sendMessageRequest.setMessage();
-            //        sendMessageRequest.setPassword("password");
-            //        sendMessageRequest.setReceiverId(getReceiver().getId());
-            //        sendMessageRequest.setSenderId(1L);
-            //        SendMessage.call(sendMessageRequest);
+            
+            SendMessageRequest sendMessageRequest = new SendMessageRequest();
+            sendMessageRequest.setMessage(Base64.toBase64String(encryptedMessage.getBytes()));
+            sendMessageRequest.setReceiverId(getReceiver().getId());
+            SendMessage.call(sendMessageRequest);
     	}
 
     }	

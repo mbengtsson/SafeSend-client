@@ -15,6 +15,9 @@
     <string name="empty_message">You can\'t send a empty message.</string>
     <string name="failed_pub_key">Failed to get the receivers public key.</string>
     <string name="failed_encryption">Failed to encrypt the message.</string>
+    <string name="failed_send_message">Failed to send the message.</string>
+    
+    <string name="success_send_message">Message sent.</string>
     
     <string name="status_get_pubkey">Receiving public key</string>
     <string name="status_encrypting">Encrypting message</string>
