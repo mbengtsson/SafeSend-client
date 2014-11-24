@@ -105,7 +105,8 @@ public class MessageListFragment extends Fragment {
             @Override
             public void onItemClick (AdapterView<?> parent, View view, int pos,
                                      long id) {
-            	final Message message = adapter.getMessage(pos);
+            	final Message message = adapter.getMessage(pos - 1);
+            	Log.d(TAG, String.valueOf(message.getMessageId()));
 				final Intent intent = new Intent(getActivity(), OpenMessageActivity.class);
 				intent.putExtra(OpenMessageActivity.INTENT_MESSAGE, message);
 				getActivity().startActivity(intent);

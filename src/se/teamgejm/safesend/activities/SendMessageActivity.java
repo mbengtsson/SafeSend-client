@@ -1,8 +1,6 @@
 package se.teamgejm.safesend.activities;
 
 
-import java.nio.charset.Charset;
-
 import org.spongycastle.util.encoders.Base64;
 
 import se.teamgejm.safesend.R;
@@ -85,13 +83,11 @@ public class SendMessageActivity extends Activity {
     }
 
     public void onEvent (UserPubkeySuccessEvent event) {
-    	// Recieve public key
         getReceiver().setPublicKey(event.getPubkey());
         
-        byte[] decoded = Base64.decode(getReceiver().getPublicKey().getBytes());
-
-    	// Create a file of the public key
-        PgpHelper.createFile(getApplicationContext(), new String(decoded, Charset.defaultCharset()), PgpHelper.KEY_PUBLIC);
+        byte[] decodedPublicKey = Base64.decode(getReceiver().getPublicKey().getBytes());
+        
+        PgpHelper.createFile(getApplicationContext(), decodedPublicKey, PgpHelper.KEY_PUBLIC);
         
         signAndEncrypt();
     }

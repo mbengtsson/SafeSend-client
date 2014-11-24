@@ -38,13 +38,13 @@ public class User implements Comparable<User>, Serializable {
         this.displayName = displayName;
     }
 
-    public String getPublicKey () {
-        return publicKey;
-    }
+	public String getPublicKey() {
+		return publicKey;
+	}
 
-    public void setPublicKey (String publicKey) {
-        this.publicKey = publicKey;
-    }
+	public void setPublicKey(String publicKey) {
+		this.publicKey = publicKey;
+	}
 
     @Override
 	public String toString() {
@@ -55,5 +55,6 @@ public class User implements Comparable<User>, Serializable {
     public int compareTo (User another) {
         return getDisplayName().compareToIgnoreCase(another.getDisplayName());
     }
+
 
 }

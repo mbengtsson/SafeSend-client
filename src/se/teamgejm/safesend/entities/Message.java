@@ -16,7 +16,7 @@ public class Message implements Serializable {
     private User sender;
     private long timeStamp;
     private MessageType messageType;
-    private String messageData;
+    private String message;
 
     public Message () {
     	setMessageType(MessageType.TEXT);
@@ -52,12 +52,12 @@ public class Message implements Serializable {
         this.messageType = messageType;
     }
 
-    public String getMessageData () {
-        return messageData;
+    public String getMessage () {
+        return message;
     }
 
-    public void setMessageData (String messageData) {
-        this.messageData = messageData;
+    public void setMessage (String message) {
+        this.message = message;
     }
 
 	public long getMessageId() {
@@ -70,7 +70,7 @@ public class Message implements Serializable {
 
     @Override
     public String toString () {
-        return "Sender: " + sender + " Timestamp: " + timeStamp + " Msgtype: " + messageType.getNiceName();
+        return "MessageId: " + messageId + " Sender: " + sender + " Timestamp: " + timeStamp + " Msgtype: " + messageType.getNiceName();
     }
 
 }
