@@ -6,6 +6,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import se.teamgejm.safesend.entities.User;
+import se.teamgejm.safesend.events.UserPubkeyFailedEvent;
 import se.teamgejm.safesend.events.UserPubkeySuccessEvent;
 
 /**
@@ -23,6 +24,7 @@ public class FetchUserKey {
         @Override
         public void failure (RetrofitError error) {
             Log.d(TAG, "Failed to load user pubkey : " + error.getMessage());
+            EventBus.getDefault().post(new UserPubkeyFailedEvent(error));
         }
 
         @Override

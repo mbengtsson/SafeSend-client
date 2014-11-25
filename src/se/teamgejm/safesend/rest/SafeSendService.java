@@ -5,10 +5,12 @@ import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.Path;
-import se.teamgejm.safesend.entities.SendMessageRequest;
+import se.teamgejm.safesend.entities.Message;
 import se.teamgejm.safesend.entities.User;
 import se.teamgejm.safesend.entities.request.RegisterUserRequest;
+import se.teamgejm.safesend.entities.request.SendMessageRequest;
 import se.teamgejm.safesend.entities.request.ValidateCredentialsRequest;
+import se.teamgejm.safesend.entities.response.MessageResponse;
 import se.teamgejm.safesend.entities.response.UserResponse;
 
 import java.util.List;
@@ -30,7 +32,13 @@ public interface SafeSendService {
     @GET("/api/users/{id}/pubkey")
     public void getUserKey (@Path("id") long id, Callback<User> cb);
 
-    @POST("/api/messages/send")
+    @POST("/api/messages")
     public void sendMessage (@Body SendMessageRequest message, Callback<String> cb);
+    
+    @GET("/api/messages")
+    public void getMessages (Callback<List<Message>> cb);
+    
+    @GET("/api/messages/{id}")
+    public void getMessageById (@Path("id") long id, Callback<MessageResponse> cb);
 
 }

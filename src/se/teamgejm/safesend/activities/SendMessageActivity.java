@@ -10,16 +10,19 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.*;
 import de.greenrobot.event.EventBus;
+import org.spongycastle.util.encoders.Base64;
 import se.teamgejm.safesend.R;
-import se.teamgejm.safesend.database.dao.DbMessageDao;
-import se.teamgejm.safesend.database.model.DbMessage;
 import se.teamgejm.safesend.entities.User;
+import se.teamgejm.safesend.entities.request.SendMessageRequest;
+import se.teamgejm.safesend.events.SendMessageFailedEvent;
+import se.teamgejm.safesend.events.SendMessageSuccessEvent;
+import se.teamgejm.safesend.events.UserPubkeyFailedEvent;
 import se.teamgejm.safesend.events.UserPubkeySuccessEvent;
 import se.teamgejm.safesend.pgp.PgpHelper;
 import se.teamgejm.safesend.rest.FetchUserKey;
+import se.teamgejm.safesend.rest.SendMessage;
 import se.teamgejm.safesend.service.EncryptMessageIntentService;
 
 /**
@@ -33,7 +36,11 @@ public class SendMessageActivity extends Activity {
 
     private User receiver;
 
-    private DbMessageDao dbMessageDao;
+    private Button sendBtn;
+    private ProgressBar progressBar;
+    private RelativeLayout sendForm;
+    private TextView statusMessage;
+    private String message;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -42,15 +49,18 @@ public class SendMessageActivity extends Activity {
 
         setOnClickListeners();
 
+        progressBar = (ProgressBar) findViewById(R.id.send_progress_bar);
+
+        sendForm = (RelativeLayout) findViewById(R.id.send_form_layout);
+
+        statusMessage = (TextView) findViewById(R.id.send_status);
+
         if (getIntent().hasExtra(INTENT_RECEIVER)) {
             setReceiver((User) getIntent().getSerializableExtra(INTENT_RECEIVER));
         }
 
         TextView username = (TextView) findViewById(R.id.message_send_to);
         username.setText(getString(R.string.message_to) + " " + getReceiver().getDisplayName());
-
-        dbMessageDao = new DbMessageDao(this);
-        dbMessageDao.open();
     }
 
     @Override
@@ -66,55 +76,88 @@ public class SendMessageActivity extends Activity {
     }
 
     public void onEvent (UserPubkeySuccessEvent event) {
-        // Recieve public key
         getReceiver().setPublicKey(event.getPubkey());
 
-        // Create a file of the public key
-        PgpHelper.createFile(getApplicationContext(), getReceiver().getPublicKey(), PgpHelper.KEY_PUBLIC);
+        byte[] decodedPublicKey = Base64.decode(getReceiver().getPublicKey().getBytes());
+
+        PgpHelper.createFile(getApplicationContext(), decodedPublicKey, PgpHelper.KEY_PUBLIC);
 
         signAndEncrypt();
+    }
+
+    public void onEvent (UserPubkeyFailedEvent event) {
+        Toast.makeText(getApplicationContext(), getString(R.string.failed_pub_key), Toast.LENGTH_SHORT).show();
+        hideProgress();
+    }
+
+    public void onEvent (SendMessageSuccessEvent event) {
+        Toast.makeText(getApplicationContext(), getString(R.string.success_send_message), Toast.LENGTH_SHORT).show();
+        getApplicationContext().deleteFile(PgpHelper.MESSAGE_ENCRYPTED);
+        hideProgress();
+    }
+
+    public void onEvent (SendMessageFailedEvent event) {
+        Toast.makeText(getApplicationContext(), getString(R.string.failed_send_message), Toast.LENGTH_SHORT).show();
+        getApplicationContext().deleteFile(PgpHelper.MESSAGE_ENCRYPTED);
+        hideProgress();
     }
 
     /**
      * Sign and encrypt the message
      */
     private void signAndEncrypt () {
-        TextView messageView = (TextView) findViewById(R.id.message_text);
-        final String plainMessage = messageView.getText().toString();
+        statusMessage.setText(R.string.status_encrypting);
 
-        Log.d(TAG, "Message : " + plainMessage);
+        Log.d(TAG, "Message : " + message);
 
-        final DbMessage dbMessage = new DbMessage();
-        dbMessage.setMessage(plainMessage);
-        final DbMessage dbMessage1 = dbMessageDao.addMessage(dbMessage);
+        registerResponseReciever();
 
-        Log.d(TAG, "SQLite Message : " + dbMessage1.toString());
-
-        // Start sign and encrypt
         Intent encryptIntent = new Intent(this, EncryptMessageIntentService.class);
-        encryptIntent.putExtra(EncryptMessageIntentService.MESSAGE_IN, plainMessage);
+        encryptIntent.putExtra(EncryptMessageIntentService.MESSAGE_IN, message);
         startService(encryptIntent);
     }
 
     private void setOnClickListeners () {
-        Button sendBtn = (Button) findViewById(R.id.message_send_button);
+        sendBtn = (Button) findViewById(R.id.message_send_button);
         sendBtn.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick (View v) {
                 Log.d(TAG, "Send button clicked");
-                IntentFilter filter = new IntentFilter(EncryptMessageResponseReciever.ACTION_RESP);
-                filter.addCategory(Intent.CATEGORY_DEFAULT);
-                registerReceiver(new EncryptMessageResponseReciever(), filter);
+                final TextView text = (TextView) findViewById(R.id.message_text);
+                message = text.getText().toString();
+                if (message.isEmpty()) {
+                    Toast.makeText(getApplicationContext(), getString(R.string.empty_message), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                showProgress();
                 getReceiverPublicKey();
             }
         });
     }
 
+    private void registerResponseReciever () {
+        IntentFilter filter = new IntentFilter(EncryptMessageResponseReciever.ACTION_RESP);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(new EncryptMessageResponseReciever(), filter);
+    }
 
     private void getReceiverPublicKey () {
         Log.d(TAG, "Getting public key");
+        statusMessage.setText(R.string.status_get_pubkey);
         FetchUserKey.call(getReceiver().getId());
+    }
+
+    private void showProgress () {
+        progressBar.setVisibility(View.VISIBLE);
+        statusMessage.setVisibility(View.VISIBLE);
+        sendForm.setVisibility(View.GONE);
+    }
+
+    private void hideProgress () {
+        progressBar.setVisibility(View.GONE);
+        statusMessage.setVisibility(View.GONE);
+        sendForm.setVisibility(View.VISIBLE);
     }
 
     private User getReceiver () {
@@ -134,18 +177,22 @@ public class SendMessageActivity extends Activity {
 
         @Override
         public void onReceive (Context context, Intent intent) {
-            final String encryptedMessage = intent.getStringExtra(EncryptMessageIntentService.MESSAGE_OUT);
+            unregisterReceiver(this);
+            String encryptedMessage = intent.getStringExtra(EncryptMessageIntentService.MESSAGE_OUT);
             Log.d(TAG, "Encrypted message:" + encryptedMessage);
 
-            // TODO: Send the message.
-            //        SendMessageRequest sendMessageRequest = new SendMessageRequest();
-            //        sendMessageRequest.setMessage();
-            //        sendMessageRequest.setPassword("password");
-            //        sendMessageRequest.setReceiverId(getReceiver().getId());
-            //        sendMessageRequest.setSenderId(1L);
-            //        SendMessage.call(sendMessageRequest);
+            if (encryptedMessage == null) {
+                Toast.makeText(getApplicationContext(), getString(R.string.failed_encryption), Toast.LENGTH_SHORT).show();
+                hideProgress();
+                return;
+            }
 
-            unregisterReceiver(this);
+            statusMessage.setText(R.string.status_sending);
+
+            SendMessageRequest sendMessageRequest = new SendMessageRequest();
+            sendMessageRequest.setMessage(Base64.toBase64String(encryptedMessage.getBytes()));
+            sendMessageRequest.setReceiverId(getReceiver().getId());
+            SendMessage.call(sendMessageRequest);
         }
 
     }

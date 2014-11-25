@@ -1,6 +1,8 @@
 package se.teamgejm.safesend.adapters;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import se.teamgejm.safesend.R;
@@ -95,12 +97,12 @@ public class MessageAdapter extends BaseAdapter {
 
         if (convertView == null) {
             final LayoutInflater inflater = mContext.getLayoutInflater();
-            convertView = inflater.inflate(R.layout.user_list_item, parent, false);
+            convertView = inflater.inflate(R.layout.message_list_item, parent, false);
 
             holder = new MessageHolder();
-            holder.username = (TextView) convertView.findViewById(R.id.user_item_username);
-            holder.timestamp = (TextView) convertView.findViewById(R.id.message_time);
-            holder.messageType = (TextView) convertView.findViewById(R.id.message_type);
+            holder.username = (TextView) convertView.findViewById(R.id.message_item_username);
+            holder.timestamp = (TextView) convertView.findViewById(R.id.message_item_time);
+            holder.messageType = (TextView) convertView.findViewById(R.id.message_item_type);
 
             convertView.setTag(holder);
         }
@@ -111,11 +113,13 @@ public class MessageAdapter extends BaseAdapter {
         final Message message = mItems.get(position);
 
         final Typeface font = Typeface.createFromAsset(mContext.getAssets(), "fontawesome-webfont.ttf");
-        final TextView icon = (TextView) convertView.findViewById(R.id.user_item_icon);
+        final TextView icon = (TextView) convertView.findViewById(R.id.message_item_icon);
         icon.setTypeface(font);
+        
+        Date date = new Date(message.getTimeStamp());
 
-        holder.username.setText(message.getOrigin().getDisplayName());
-        holder.timestamp.setText(message.getTimestamp());
+        holder.username.setText(message.getSender().getDisplayName());
+        holder.timestamp.setText(DateFormat.getDateInstance().format(date));
         holder.messageType.setText(message.getMessageType().getNiceName());
 
         return convertView;

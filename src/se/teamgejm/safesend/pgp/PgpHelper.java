@@ -78,8 +78,6 @@ public class PgpHelper {
     public static void generateKeyPair (Context context, String identity, String password) {
         PgpHelper.context = context;
 
-        Security.addProvider(new BouncyCastleProvider());
-
         try {
             KeyPair dsaKeyPair = generateDsaKeyPair(1024);
             KeyPair elGamalKeyPair = generateElGamalKeyPair(PRIME_MODULUS, BASE_GENERATOR);
@@ -95,13 +93,13 @@ public class PgpHelper {
         }
     }
 
-    public static void createFile (Context context, String content, String fileName) {
+    public static void createFile (Context context, byte[] content, String fileName) {
         PgpHelper.context = context;
 
         try {
             OutputStream out = (PgpHelper.getContext().openFileOutput(fileName, Context.MODE_PRIVATE));
 
-            out.write(content.getBytes());
+            out.write(content);
 
             out.close();
         }
@@ -131,7 +129,7 @@ public class PgpHelper {
             Log.d(TAG, "STARTING ENCRYPTION PROCESS");
             Log.d(TAG, "Encrypting message...");
 
-            PgpFileProcessor.encryptFile(MESSAGE_ENCRYPTED, MESSAGE_SIGNED, KEY_PUBLIC, false, true);
+            PgpFileProcessor.encryptFile(MESSAGE_ENCRYPTED, MESSAGE_SIGNED, KEY_PUBLIC, true, true);
 
             Log.d(TAG, "Signed message encrypted!");
             Log.d(TAG, "ENCRYPTION PROCESS COMPLETE");

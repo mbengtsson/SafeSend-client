@@ -36,7 +36,7 @@ public class TestActivity extends Activity {
                 // Get the text from the user
                 EditText text = (EditText) findViewById(R.id.message);
                 // Create a file of the message
-                PgpHelper.createFile(v.getContext(), text.getText().toString(), PgpHelper.MESSAGE_PLAINTEXT);
+                PgpHelper.createFile(v.getContext(), text.getText().toString().getBytes(), PgpHelper.MESSAGE_PLAINTEXT);
                 // Sign and encrypt
                 String encryptedMessage = PgpHelper.signAndEncrypt(v.getContext());
                 text.setText(encryptedMessage);

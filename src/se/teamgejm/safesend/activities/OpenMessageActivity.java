@@ -1,11 +1,16 @@
 package se.teamgejm.safesend.activities;
 
+import java.text.DateFormat;
+import java.util.Date;
+
+import org.spongycastle.util.encoders.Base64;
+
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.entities.Message;
-import se.teamgejm.safesend.entities.User;
-import se.teamgejm.safesend.events.UserPubkeySuccessEvent;
+import se.teamgejm.safesend.events.MessageByIdFailedEvent;
+import se.teamgejm.safesend.events.MessageByIdSuccessfulEvent;
 import se.teamgejm.safesend.pgp.PgpHelper;
-import se.teamgejm.safesend.rest.FetchUserKey;
+import se.teamgejm.safesend.rest.FetchMessageById;
 import se.teamgejm.safesend.service.DecryptMessageIntentService;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -15,9 +20,11 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import de.greenrobot.event.EventBus;
 
 /**
  * 
@@ -30,88 +37,107 @@ public class OpenMessageActivity extends Activity {
 	
 	private static final String TAG = "OpenMessageActivity";
 	
-	private Message message;
+	private Message incomingMessage;
 	
-	private User sender;
+	private ProgressBar progressBar;
+	private RelativeLayout openForm;
+	private TextView statusMessage;
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_open_message);
         
-        setOnClickListeners();
-        
         if (getIntent().hasExtra(INTENT_MESSAGE)) {
-        	message = (Message) getIntent().getSerializableExtra(INTENT_MESSAGE);
+        	incomingMessage = (Message) getIntent().getSerializableExtra(INTENT_MESSAGE);
         }
+		
+		progressBar = (ProgressBar) findViewById(R.id.open_progressBar);
+		
+		openForm = (RelativeLayout) findViewById(R.id.open_form_layout);
+		
+		statusMessage = (TextView) findViewById(R.id.open_status);
         
         TextView origin = (TextView) findViewById(R.id.message_origin);
-        origin.setText(getString(R.string.from) + " " + getMessage().getOrigin().getDisplayName());
+        origin.setText(getString(R.string.from) + " " + getIncomingMessage().getSender().getDisplayName());
+        
+        Date date = new Date(getIncomingMessage().getTimeStamp());
         
         TextView time = (TextView) findViewById(R.id.message_time);
-        time.setText(getMessage().getTimestamp());
+        time.setText(DateFormat.getDateInstance().format(date));
         
         TextView type = (TextView) findViewById(R.id.message_type);
-        type.setText(getString(R.string.type) + " " + getMessage().getMessageType());
+        type.setText(getString(R.string.type) + " " + getIncomingMessage().getMessageType());
+        
+        showProgress();
     }
 	
-    public void onEvent (UserPubkeySuccessEvent event) {
-    	// Recieve public key (this might change)
-        getSender().setPublicKey(event.getPubkey());
+    @Override
+    public void onStart () {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
 
-    	// Create a file of the public key
-        PgpHelper.createFile(getApplicationContext(), getSender().getPublicKey(), PgpHelper.KEY_PUBLIC);
-
-        decryptAndVerify();
+    @Override
+    public void onStop () {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+    
+    public void onEvent(MessageByIdSuccessfulEvent event) {
+    	getIncomingMessage().setMessage(event.getMessage());
+    	
+    	final String publicKey = event.getSenderPublicKey();
+    	
+    	byte[] decodedPublicKey = Base64.decode(publicKey.getBytes());
+    	PgpHelper.createFile(getApplicationContext(), decodedPublicKey, PgpHelper.KEY_PUBLIC);
+    	
+    	decryptAndVerify(getIncomingMessage().getMessage());
+    }
+    
+    public void onEvent(MessageByIdFailedEvent event) {
+    	Toast.makeText(getApplicationContext(), getString(R.string.failed_message_by_id), Toast.LENGTH_SHORT).show();
+    	hideProgress();
     }
     
     /**
      * Decrypt and verify the encrypted message
      */
-    private void decryptAndVerify() {
-    	// TODO: Get the encrypted message from the local database
-        final String encryptedMessage = null;
-        
-        // Start decrypt and verify
+    private void decryptAndVerify(String encryptedMessage) {
+    	statusMessage.setText(R.string.status_decrypting);
         Intent decryptIntent = new Intent(this, DecryptMessageIntentService.class);
         decryptIntent.putExtra(DecryptMessageIntentService.MESSAGE_IN, encryptedMessage);
         startService(decryptIntent);
     }
-
-	private void setOnClickListeners() {
-		ImageButton openBtn = (ImageButton) findViewById(R.id.message_open_button);
-		openBtn.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Log.i(TAG, "Open message button clicked");
-		        IntentFilter filter = new IntentFilter(DecryptMessageResponseReciever.ACTION_RESP);
-		        filter.addCategory(Intent.CATEGORY_DEFAULT);
-		        registerReceiver(new DecryptMessageResponseReciever(), filter);
-				getSenderPublicKey();
-			}
-		});
-	}
 	
-    private void getSenderPublicKey () {
-        Log.d(TAG, "Getting public key");
-        FetchUserKey.call(getSender().getId());
-    }
-	
-    public Message getMessage() {
-		return message;
+    public Message getIncomingMessage() {
+		return incomingMessage;
 	}
 
-	public void setMessage(Message message) {
-		this.message = message;
+	public void setIncomingMessage(Message message) {
+		this.incomingMessage = message;
 	}
 	
-    public User getSender() {
-		return sender;
+	private void registerResponseReciever() {
+		IntentFilter filter = new IntentFilter(DecryptMessageResponseReciever.ACTION_RESP);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(new DecryptMessageResponseReciever(), filter);
 	}
-
-	public void setSender(User sender) {
-		this.sender = sender;
+	
+	private void showProgress() {
+		registerResponseReciever();
+		
+		progressBar.setVisibility(View.VISIBLE);
+		statusMessage.setVisibility(View.VISIBLE);
+		openForm.setVisibility(View.GONE);
+    	statusMessage.setText(R.string.status_fetching_message);
+		FetchMessageById.call(incomingMessage.getMessageId());
+	}
+	
+	private void hideProgress() {
+		progressBar.setVisibility(View.GONE);
+		statusMessage.setVisibility(View.GONE);
+		openForm.setVisibility(View.VISIBLE);
 	}
 
     /**
@@ -125,11 +151,22 @@ public class OpenMessageActivity extends Activity {
 
     	@Override
     	public void onReceive(Context context, Intent intent) {
+			unregisterReceiver(this);
     		final String message = intent.getStringExtra(DecryptMessageIntentService.MESSAGE_OUT);
     		Log.d(TAG, "Decrypted message:" + message);
     		
-    		//TODO: Show message and save to local database
-			unregisterReceiver(this);
+    		if (message == null) {
+    			Toast.makeText(getApplicationContext(), getString(R.string.failed_decryption), Toast.LENGTH_SHORT).show();
+    			hideProgress();
+    			return;
+    		}
+    		
+    		TextView messageContent = (TextView) findViewById(R.id.message_content);
+    		messageContent.setText(message);
+    		
+    		//TODO: Save message to local database
+    		
+    		hideProgress();
     	}
 
     }	

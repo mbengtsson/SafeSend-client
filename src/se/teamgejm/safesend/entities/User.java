@@ -2,6 +2,7 @@ package se.teamgejm.safesend.entities;
 
 import java.io.Serializable;
 
+@SuppressWarnings("serial")
 public class User implements Comparable<User>, Serializable {
 
     private long id;
@@ -37,17 +38,23 @@ public class User implements Comparable<User>, Serializable {
         this.displayName = displayName;
     }
 
-    public String getPublicKey () {
-        return publicKey;
-    }
+	public String getPublicKey() {
+		return publicKey;
+	}
 
-    public void setPublicKey (String publicKey) {
-        this.publicKey = publicKey;
-    }
+	public void setPublicKey(String publicKey) {
+		this.publicKey = publicKey;
+	}
 
     @Override
+	public String toString() {
+    	return "{Id= " + id + " Email= " + email + " DisplayName= " + displayName + "}";
+	}
+
+	@Override
     public int compareTo (User another) {
         return getDisplayName().compareToIgnoreCase(another.getDisplayName());
     }
+
 
 }

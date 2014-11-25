@@ -26,7 +26,7 @@ public class EncryptMessageIntentService extends IntentService {
 	protected void onHandleIntent(Intent intent) {
 		Log.d(TAG, "OnHandleIntent");
 		String message = intent.getStringExtra(MESSAGE_IN);
-		PgpHelper.createFile(getApplicationContext(), message, PgpHelper.MESSAGE_PLAINTEXT);
+		PgpHelper.createFile(getApplicationContext(), message.getBytes(), PgpHelper.MESSAGE_PLAINTEXT);
 		String encryptedMessage = PgpHelper.signAndEncrypt(getApplicationContext());
 		
 		Intent broadcastIntent = new Intent();

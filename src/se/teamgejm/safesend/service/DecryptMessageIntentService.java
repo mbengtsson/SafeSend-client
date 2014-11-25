@@ -1,5 +1,7 @@
 package se.teamgejm.safesend.service;
 
+import org.spongycastle.util.encoders.Base64;
+
 import se.teamgejm.safesend.activities.OpenMessageActivity.DecryptMessageResponseReciever;
 import se.teamgejm.safesend.pgp.PgpHelper;
 import android.app.IntentService;
@@ -26,7 +28,10 @@ public class DecryptMessageIntentService extends IntentService {
 	protected void onHandleIntent(Intent intent) {
 		Log.d(TAG, "OnHandleIntent");
 		String encryptedMessage = intent.getStringExtra(MESSAGE_IN);
-		PgpHelper.createFile(getApplicationContext(), encryptedMessage, PgpHelper.MESSAGE_ENCRYPTED);
+		
+    	byte[] decodedEncryptedMessage = Base64.decode(encryptedMessage.getBytes());
+    	
+		PgpHelper.createFile(getApplicationContext(), decodedEncryptedMessage, PgpHelper.MESSAGE_ENCRYPTED);
 		String message = PgpHelper.decryptAndVerify(getApplicationContext());
 		
 		Intent broadcastIntent = new Intent();
