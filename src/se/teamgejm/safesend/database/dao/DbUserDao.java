@@ -5,8 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import se.teamgejm.safesend.database.UserTable;
-import se.teamgejm.safesend.database.model.DbUser;
+import android.util.Log;
+import se.teamgejm.safesend.database.SafeSendSqlHelper;
+import se.teamgejm.safesend.entities.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,43 +18,61 @@ import java.util.List;
 public class DbUserDao {
 
     private SQLiteDatabase database;
-    private UserTable userTable;
+    private SafeSendSqlHelper sqlHelper;
 
     public DbUserDao (Context context) {
-        userTable = new UserTable(context);
+        sqlHelper = new SafeSendSqlHelper(context);
     }
 
     public void open () throws SQLException {
-        database = userTable.getWritableDatabase();
+        database = sqlHelper.getWritableDatabase();
     }
 
     public void close () {
-        userTable.close();
+        sqlHelper.close();
     }
 
-    public DbUser addUser (DbUser user) {
+    public User addUser (User user) {
+        final User userFromDb = getUser(user.getUserId());
+        if (userFromDb != null) {
+            Log.d("SAVED USER", userFromDb.toString());
+            return userFromDb;
+        }
+
         ContentValues values = new ContentValues();
         values.put("userId", user.getUserId());
         values.put("email", user.getEmail());
         values.put("displayName", user.getDisplayName());
-        values.put("publicKey", user.getDisplayName());
+        values.put("publicKey", user.getPublicKey());
 
         long insertId = database.insert("users", null, values);
         Cursor cursor = database.rawQuery("SELECT * FROM users WHERE _id = ?", new String[]{String.valueOf(insertId)});
         cursor.moveToFirst();
-        DbUser newUser = cursorToUser(cursor);
+        User newUser = cursorToUser(cursor);
         cursor.close();
         return newUser;
     }
 
-    public List<DbUser> getAllUsers () {
-        List<DbUser> users = new ArrayList<>();
+    public User getUser (long userId) {
+        Cursor cursor = database.rawQuery("SELECT * FROM users WHERE userId = ?", new String[]{String.valueOf(userId)});
+        cursor.moveToFirst();
+        Log.d("RESTULS", "" + cursor.getCount());
+        if (cursor.getCount() == 0) {
+            return null;
+        }
+        User newUser = cursorToUser(cursor);
+        cursor.close();
+        return newUser;
+    }
+
+    public List<User> getAllUsers () {
+        List<User> users = new ArrayList<>();
 
         Cursor cursor = database.rawQuery("SELECT * FROM users", new String[]{});
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            DbUser user = cursorToUser(cursor);
+            User user = cursorToUser(cursor);
             users.add(user);
             cursor.moveToNext();
         }
@@ -61,8 +80,8 @@ public class DbUserDao {
         return users;
     }
 
-    private DbUser cursorToUser (Cursor cursor) {
-        DbUser user = new DbUser();
+    private User cursorToUser (Cursor cursor) {
+        User user = new User();
         user.setId(cursor.getLong(0));
         user.setUserId(cursor.getLong(1));
         user.setEmail(cursor.getString(2));

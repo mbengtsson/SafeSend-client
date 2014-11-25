@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import se.teamgejm.safesend.R;
+import se.teamgejm.safesend.database.dao.DbMessageDao;
 import se.teamgejm.safesend.database.dao.DbUserDao;
 
 import java.security.Security;
@@ -17,6 +18,7 @@ import java.security.Security;
 public class MainActivity extends Activity {
 
     private DbUserDao dbUserDao;
+    private DbMessageDao dbMessageDao;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -31,7 +33,8 @@ public class MainActivity extends Activity {
         dbUserDao = new DbUserDao(this);
         dbUserDao.open();
 
-
+        dbMessageDao = new DbMessageDao(this);
+        dbMessageDao.open();
     }
 
     @Override

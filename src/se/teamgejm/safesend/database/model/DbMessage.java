@@ -1,5 +1,7 @@
 package se.teamgejm.safesend.database.model;
 
+import se.teamgejm.safesend.entities.User;
+
 /**
  * @author Emil Stjerneman
  */
@@ -9,6 +11,8 @@ public class DbMessage {
     private long messageId;
     private String status;
     private String message;
+    private User sender;
+    private User receiver;
 
     public long getId () {
         return id;
@@ -42,6 +46,22 @@ public class DbMessage {
         this.message = message;
     }
 
+    public User getSender () {
+        return sender;
+    }
+
+    public void setSender (User sender) {
+        this.sender = sender;
+    }
+
+    public User getReceiver () {
+        return receiver;
+    }
+
+    public void setReceiver (User receiver) {
+        this.receiver = receiver;
+    }
+
     @Override
     public String toString () {
         return "DbMessage{" +
@@ -49,6 +69,8 @@ public class DbMessage {
                 ", messageId=" + messageId +
                 ", status='" + status + '\'' +
                 ", message='" + message + '\'' +
+                ", sender=" + sender +
+                ", receiver=" + receiver +
                 '}';
     }
 }

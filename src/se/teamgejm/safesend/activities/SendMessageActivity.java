@@ -19,7 +19,8 @@ import org.spongycastle.util.encoders.Base64;
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.adapters.UserAdapter;
 import se.teamgejm.safesend.database.dao.DbMessageDao;
-import se.teamgejm.safesend.database.model.DbMessage;
+import se.teamgejm.safesend.database.dao.DbUserDao;
+import se.teamgejm.safesend.entities.Message;
 import se.teamgejm.safesend.entities.User;
 import se.teamgejm.safesend.entities.request.SendMessageRequest;
 import se.teamgejm.safesend.events.*;
@@ -41,6 +42,7 @@ public class SendMessageActivity extends Activity {
 
     private User receiver;
 
+    private DbUserDao dbUserDao;
     private DbMessageDao dbMessageDao;
 
     private UserAdapter adapter;
@@ -102,6 +104,9 @@ public class SendMessageActivity extends Activity {
 
         dbMessageDao = new DbMessageDao(this);
         dbMessageDao.open();
+
+        dbUserDao = new DbUserDao(this);
+        dbUserDao.open();
 
         statusMessage.setText("Loading users.");
         showProgress();
@@ -179,11 +184,16 @@ public class SendMessageActivity extends Activity {
         Toast.makeText(getApplicationContext(), getString(R.string.success_send_message), Toast.LENGTH_SHORT).show();
         getApplicationContext().deleteFile(PgpHelper.MESSAGE_ENCRYPTED);
 
-        final DbMessage dbMessage = new DbMessage();
-        dbMessage.setMessage(message);
-        final DbMessage dbMessage1 = dbMessageDao.addMessage(dbMessage);
+        Log.d("RECEIVER", getReceiver().toString());
 
-        Log.d(TAG, "SQLite Message : " + dbMessage1.toString());
+        final User receiver = dbUserDao.addUser(getReceiver());
+
+        Message message = new Message();
+        message.setSender(null);
+        message.setReceiver(getReceiver());
+        message.setTimeStamp(System.currentTimeMillis() / 1000);
+        message.setMessage(this.message);
+        dbMessageDao.addMessage(message);
 
         hideProgress();
     }
@@ -237,7 +247,7 @@ public class SendMessageActivity extends Activity {
     private void getReceiverPublicKey () {
         Log.d(TAG, "Getting public key");
         statusMessage.setText(R.string.status_get_pubkey);
-        FetchUserKey.call(getReceiver().getId());
+        FetchUserKey.call(getReceiver().getUserId());
     }
 
     private void showProgress () {
@@ -281,7 +291,7 @@ public class SendMessageActivity extends Activity {
 
             SendMessageRequest sendMessageRequest = new SendMessageRequest();
             sendMessageRequest.setMessage(Base64.toBase64String(encryptedMessage.getBytes()));
-            sendMessageRequest.setReceiverId(getReceiver().getId());
+            sendMessageRequest.setReceiverId(getReceiver().getUserId());
             SendMessage.call(sendMessageRequest);
         }
 

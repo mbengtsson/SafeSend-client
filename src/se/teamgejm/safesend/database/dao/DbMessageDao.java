@@ -5,11 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import se.teamgejm.safesend.database.MessageTable;
-import se.teamgejm.safesend.database.model.DbMessage;
-
-import java.text.DateFormat;
-import java.util.Date;
+import se.teamgejm.safesend.database.SafeSendSqlHelper;
+import se.teamgejm.safesend.entities.Message;
 
 /**
  * @author Emil Stjerneman
@@ -17,30 +14,33 @@ import java.util.Date;
 public class DbMessageDao {
 
     private SQLiteDatabase database;
-    private MessageTable messageTable;
+    private SafeSendSqlHelper sqlHelper;
 
     public DbMessageDao (Context context) {
-        messageTable = new MessageTable(context);
+        sqlHelper = new SafeSendSqlHelper(context);
     }
 
     public void open () throws SQLException {
-        database = messageTable.getWritableDatabase();
+        database = sqlHelper.getWritableDatabase();
     }
 
     public void close () {
-        messageTable.close();
+        sqlHelper.close();
     }
 
-    public DbMessage addMessage (DbMessage message) {
+    public Message addMessage (Message message) {
         ContentValues values = new ContentValues();
+        if (message.getSender() != null) {
+            values.put("senderId", message.getSender().getUserId());
+        }
+        values.put("receiverId", message.getReceiver().getUserId());
         values.put("message", message.getMessage());
-        values.put("status", "FAKE");
-        values.put("dateTime", DateFormat.getDateTimeInstance().format(new Date()));
+        values.put("dateTime", message.getTimeStamp());
 
         long insertId = database.insert("messages", null, values);
         Cursor cursor = database.rawQuery("SELECT * FROM messages WHERE _id = ?", new String[]{String.valueOf(insertId)});
         cursor.moveToFirst();
-        DbMessage newMessage = cursorToMessage(cursor);
+        Message newMessage = cursorToMessage(cursor);
         cursor.close();
         return newMessage;
     }
@@ -62,10 +62,13 @@ public class DbMessageDao {
     //        return comments;
     //    }
     //
-    private DbMessage cursorToMessage (Cursor cursor) {
-        DbMessage message = new DbMessage();
+    private Message cursorToMessage (Cursor cursor) {
+        Message message = new Message();
         message.setId(cursor.getLong(0));
-        message.setMessage(cursor.getString(1));
+
+        message.setMessage(cursor.getString(3));
+        message.setTimeStamp(cursor.getLong(4));
+
         return message;
     }
 }

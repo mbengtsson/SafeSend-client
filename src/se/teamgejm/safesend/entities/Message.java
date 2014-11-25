@@ -1,47 +1,56 @@
 package se.teamgejm.safesend.entities;
 
-import java.io.Serializable;
-
 import se.teamgejm.safesend.enums.MessageType;
 
+import java.io.Serializable;
+
 /**
- * 
  * @author Gustav
- *
  */
 @SuppressWarnings("serial")
 public class Message implements Serializable {
 
-	private long messageId;
-    private User sender;
+    private long id;
+    private long messageId;
     private long timeStamp;
     private MessageType messageType;
     private String message;
 
+    private User sender;
+    private User receiver;
+
     public Message () {
-    	setMessageType(MessageType.TEXT);
+        setMessageType(MessageType.TEXT);
     }
 
     public Message (User sender, long timeStamp) {
-    	this();
+        this();
         setSender(sender);
         setTimeStamp(timeStamp);
     }
 
-    public User getSender () {
-        return sender;
+    public long getId () {
+        return id;
     }
 
-    public void setSender (User origin) {
-        this.sender = origin;
+    public void setId (long id) {
+        this.id = id;
+    }
+
+    public long getMessageId () {
+        return messageId;
+    }
+
+    public void setMessageId (long messageId) {
+        this.messageId = messageId;
     }
 
     public long getTimeStamp () {
         return timeStamp;
     }
 
-    public void setTimeStamp (long timestamp) {
-        this.timeStamp = timestamp;
+    public void setTimeStamp (long timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
     public MessageType getMessageType () {
@@ -60,17 +69,32 @@ public class Message implements Serializable {
         this.message = message;
     }
 
-	public long getMessageId() {
-		return messageId;
-	}
+    public User getSender () {
+        return sender;
+    }
 
-	public void setMessageId(long messageId) {
-		this.messageId = messageId;
-	}
+    public void setSender (User sender) {
+        this.sender = sender;
+    }
+
+    public User getReceiver () {
+        return receiver;
+    }
+
+    public void setReceiver (User receiver) {
+        this.receiver = receiver;
+    }
 
     @Override
     public String toString () {
-        return "MessageId: " + messageId + " Sender: " + sender + " Timestamp: " + timeStamp + " Msgtype: " + messageType.getNiceName();
+        return "Message{" +
+                "id=" + id +
+                ", messageId=" + messageId +
+                ", timeStamp=" + timeStamp +
+                ", messageType=" + messageType +
+                ", message='" + message + '\'' +
+                ", sender=" + sender +
+                ", receiver=" + receiver +
+                '}';
     }
-
 }
