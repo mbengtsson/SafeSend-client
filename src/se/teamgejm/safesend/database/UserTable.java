@@ -10,15 +10,15 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class UserTable extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "safesend.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = "CREATE TABLE users ("
-            + "_id INT PRIMARY KEY AUTOINCREMENT,"
-            + "userId INT NOT NULL,"
-            + "email VARCHAR(255) NOT NULL,"
-            + "displayName VARCHAR(255) NOT NULL,"
-            + "publicKey TEXT NOT NULL"
+            + "_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + "userId INT,"
+            + "email VARCHAR(255),"
+            + "displayName VARCHAR(255),"
+            + "publicKey TEXT"
             + ");";
 
     public UserTable (Context context) {
@@ -32,6 +32,7 @@ public class UserTable extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade (SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        db.execSQL("DROP TABLE IF EXISTS users");
+        onCreate(db);
     }
 }

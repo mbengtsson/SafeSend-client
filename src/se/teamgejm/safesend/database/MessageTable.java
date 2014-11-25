@@ -10,13 +10,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class MessageTable extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "safesend.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = "CREATE TABLE messages ("
-            + "_id INTEGER  PRIMARY KEY AUTOINCREMENT,"
+            + "_id INTEGER PRIMARY KEY AUTOINCREMENT,"
             + "messageId INT,"
             + "senderId INT,"
+            + "receiverId INT,"
             + "status VARCHAR(255) NOT NULL,"
             + "message TEXT NOT NULL,"
             + "dateTime TEXT NOT NULL"
@@ -33,6 +34,7 @@ public class MessageTable extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade (SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        db.execSQL("DROP TABLE IF EXISTS messages");
+        onCreate(db);
     }
 }
