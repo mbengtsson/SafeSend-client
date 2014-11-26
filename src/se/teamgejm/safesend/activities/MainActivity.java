@@ -2,17 +2,26 @@ package se.teamgejm.safesend.activities;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.*;
 import se.teamgejm.safesend.R;
+import se.teamgejm.safesend.adapters.UserAdapter;
 import se.teamgejm.safesend.database.dao.DbMessageDao;
 import se.teamgejm.safesend.database.dao.DbUserDao;
 import se.teamgejm.safesend.entities.User;
+import se.teamgejm.safesend.service.DecryptMessageIntentService;
+import se.teamgejm.safesend.service.TestIntentService;
 
 import java.security.Security;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,6 +32,9 @@ public class MainActivity extends Activity {
     private DbUserDao dbUserDao;
     private DbMessageDao dbMessageDao;
 
+    private ListView userListView;
+    private UserAdapter adapter;
+
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,15 +44,39 @@ public class MainActivity extends Activity {
         final ActionBar actionBar = getActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
 
+        userListView = (ListView) findViewById(R.id.userListView);
+        adapter = new UserAdapter(this);
+        userListView.setAdapter(adapter);
+
+        userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick (AdapterView<?> parent, View view, int pos, long id) {
+                final User user = adapter.getUser(pos);
+                Log.d("WTF", user.toString());
+//                final Intent intent = new Intent(getActivity(), SendMessageActivity.class);
+//                intent.putExtra(SendMessageActivity.INTENT_RECEIVER, user);
+//                startActivity(intent);
+            }
+        });
+    }
+
+    @Override
+    protected void onResume () {
+        super.onResume();
 
         dbUserDao = new DbUserDao(this);
         dbUserDao.open();
 
         final List<User> usersWithMessages = dbUserDao.getUsersWithMessages();
 
+        adapter.clearUsers();
+
         for (User u : usersWithMessages) {
-            Log.d("Users", u.toString());
+            adapter.addUser(u);
         }
+
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -62,6 +98,5 @@ public class MainActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
-
 
 }
