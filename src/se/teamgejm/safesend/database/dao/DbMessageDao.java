@@ -7,7 +7,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import se.teamgejm.safesend.database.SafeSendSqlHelper;
 import se.teamgejm.safesend.entities.Message;
-import se.teamgejm.safesend.entities.User;
 
 import java.util.ArrayList;
 import java.util.List;

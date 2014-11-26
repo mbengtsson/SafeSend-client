@@ -38,8 +38,8 @@ public class TestActivity extends Activity {
                 // Create a file of the message
                 PgpHelper.createFile(v.getContext(), text.getText().toString().getBytes(), PgpHelper.MESSAGE_PLAINTEXT);
                 // Sign and encrypt
-                String encryptedMessage = PgpHelper.signAndEncrypt(v.getContext());
-                text.setText(encryptedMessage);
+//                String encryptedMessage = PgpHelper.signAndEncrypt(v.getContext());
+//                text.setText(encryptedMessage);
             }
         });
 
@@ -50,8 +50,8 @@ public class TestActivity extends Activity {
             public void onClick (View v) {
                 // Decrypt and display the message
                 EditText text = (EditText) findViewById(R.id.message);
-                String message = PgpHelper.decryptAndVerify(v.getContext());
-                text.setText(message);
+//                String message = PgpHelper.decryptAndVerify(v.getContext());
+//                text.setText(message);
             }
         });
     }
