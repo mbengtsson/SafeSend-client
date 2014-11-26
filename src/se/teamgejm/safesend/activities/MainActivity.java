@@ -2,24 +2,20 @@ package se.teamgejm.safesend.activities;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.adapters.UserAdapter;
-import se.teamgejm.safesend.database.dao.DbMessageDao;
 import se.teamgejm.safesend.database.dao.DbUserDao;
 import se.teamgejm.safesend.entities.User;
 
 import java.security.Security;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

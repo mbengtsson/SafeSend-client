@@ -13,7 +13,8 @@ public class MessageTable {
             + "senderId INT,"
             + "receiverId INT,"
             + "message TEXT,"
-            + "dateTime TEXT"
+            + "dateTime TEXT,"
+            + "status INT"
             + ");";
 
 

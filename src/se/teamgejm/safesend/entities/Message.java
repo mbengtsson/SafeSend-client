@@ -10,6 +10,10 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class Message implements Serializable {
 
+    public final static int STATUS_ENCRYPTED = 0;
+    public final static int STATUS_DECRYPTED = 1;
+
+
     private long id;
     private long messageId;
     private long timeStamp;
@@ -18,6 +22,8 @@ public class Message implements Serializable {
 
     private User sender;
     private User receiver;
+
+    private int status;
 
     public Message () {
         setMessageType(MessageType.TEXT);
@@ -85,6 +91,14 @@ public class Message implements Serializable {
         this.receiver = receiver;
     }
 
+    public int getStatus () {
+        return status;
+    }
+
+    public void setStatus (int status) {
+        this.status = status;
+    }
+
     @Override
     public String toString () {
         return "Message{" +
@@ -95,6 +109,7 @@ public class Message implements Serializable {
                 ", message='" + message + '\'' +
                 ", sender=" + sender +
                 ", receiver=" + receiver +
+                ", status=" + status +
                 '}';
     }
 }
