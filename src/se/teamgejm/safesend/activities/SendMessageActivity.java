@@ -84,12 +84,7 @@ public class SendMessageActivity extends Activity {
 
     public void onEvent (UserPubkeySuccessEvent event) {
         getReceiver().setPublicKey(event.getPubkey());
-        
-        byte[] decodedPublicKey = Base64.decode(getReceiver().getPublicKey().getBytes());
-        
-        PgpHelper.createFile(getApplicationContext(), decodedPublicKey, PgpHelper.KEY_PUBLIC);
-        
-        signAndEncrypt();
+        signAndEncrypt(getReceiver().getPublicKey().getBytes());
     }
     
     public void onEvent(UserPubkeyFailedEvent event) {
@@ -112,7 +107,7 @@ public class SendMessageActivity extends Activity {
     /**
      * Sign and encrypt the message
      */
-    private void signAndEncrypt() {
+    private void signAndEncrypt(byte[] publicKey) {
         statusMessage.setText(R.string.status_encrypting);
         
         Log.d(TAG, "Message : " + message);
@@ -121,6 +116,7 @@ public class SendMessageActivity extends Activity {
         
         Intent encryptIntent = new Intent(this, EncryptMessageIntentService.class);
         encryptIntent.putExtra(EncryptMessageIntentService.MESSAGE_IN, message);
+        encryptIntent.putExtra(EncryptMessageIntentService.KEY_PUBLIC_IN, publicKey);
         startService(encryptIntent);
     }
 

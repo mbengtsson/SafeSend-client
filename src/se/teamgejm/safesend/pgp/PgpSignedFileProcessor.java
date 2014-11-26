@@ -39,7 +39,7 @@ import android.content.Context;
 import android.util.Log;
 
 /**
- * 
+ * A file processor for verifying files and signing files/public keys.
  * @author Gustav
  *
  */
@@ -47,6 +47,18 @@ public class PgpSignedFileProcessor {
 	
 	private static final String TAG = "PgpSignedFileProcessor";
 	
+	/**
+	 * Signs a public key with the receivers private key.
+	 * 
+	 * @param secretKey 
+	 * @param secretKeyPass
+	 * @param keyToBeSigned
+	 * @param notationName
+	 * @param notationValue
+	 * 
+	 * @return The signed public key.
+	 * @throws Exception
+	 */
 	public static byte[] signPublicKey(PGPSecretKey secretKey, String secretKeyPass, PGPPublicKey keyToBeSigned,
 			String notationName, String notationValue) throws Exception {
 
@@ -69,6 +81,20 @@ public class PgpSignedFileProcessor {
 		return PGPPublicKey.addCertification(keyToBeSigned, sGen.generate()).getEncoded();
 	}
 
+	/**
+	 * Signs a file with the senders private key.
+	 * @param file
+	 * @param secretKey
+	 * @param out
+	 * @param pass
+	 * @param armor
+	 * 
+	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchProviderException
+	 * @throws PGPException
+	 * @throws SignatureException
+	 */
 	public static void signFile(File file, InputStream secretKey, OutputStream out, char[] pass, boolean armor)
 			throws IOException, NoSuchAlgorithmException, NoSuchProviderException, PGPException, SignatureException {
 		if (armor) {
@@ -117,9 +143,18 @@ public class PgpSignedFileProcessor {
 			out.close();
 		}
 		
+		fIn.close();
+		
 		secretKey.close();
 	}
 
+	/**
+	 * Verifies a file with the senders public key.
+	 * 
+	 * @param signedFile
+	 * @param keyIn
+	 * @throws Exception
+	 */
 	public static void verifyFile(String signedFile, PGPPublicKeyRing keyIn) throws Exception {
 
 		InputStream in = PgpHelper.getContext().openFileInput(signedFile);

@@ -1,31 +1,30 @@
 package se.teamgejm.safesend.activities;
 
+import java.security.Security;
+
+import org.spongycastle.util.encoders.Base64;
+
+import se.teamgejm.safesend.R;
+import se.teamgejm.safesend.entities.UserCredentials;
+import se.teamgejm.safesend.entities.request.RegisterUserRequest;
+import se.teamgejm.safesend.events.RegisterFailedEvent;
+import se.teamgejm.safesend.events.RegisterSuccessEvent;
+import se.teamgejm.safesend.io.UserCredentialsHelper;
+import se.teamgejm.safesend.rest.RegisterUser;
+import se.teamgejm.safesend.service.GenerateKeysIntentService;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 import de.greenrobot.event.EventBus;
-import org.spongycastle.util.encoders.Base64;
-import se.teamgejm.safesend.R;
-import se.teamgejm.safesend.activities.OpenMessageActivity.DecryptMessageResponseReciever;
-import se.teamgejm.safesend.entities.UserCredentials;
-import se.teamgejm.safesend.entities.request.RegisterUserRequest;
-import se.teamgejm.safesend.events.RegisterFailedEvent;
-import se.teamgejm.safesend.events.RegisterSuccessEvent;
-import se.teamgejm.safesend.io.UserCredentialsHelper;
-import se.teamgejm.safesend.pgp.PgpHelper;
-import se.teamgejm.safesend.rest.RegisterUser;
-import se.teamgejm.safesend.service.DecryptMessageIntentService;
-import se.teamgejm.safesend.service.EncryptMessageIntentService;
-import se.teamgejm.safesend.service.GenerateKeysIntentService;
-
-import java.io.IOException;
-import java.security.Security;
 
 /**
  * @author Emil Stjerneman
@@ -107,9 +106,10 @@ public class RegisterActivity extends Activity {
         final String email = ((TextView) findViewById(R.id.register_email)).getText().toString();
         final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
         
+        // Start service for generating key pairs.
         Intent genKeyIntent = new Intent(this, GenerateKeysIntentService.class);
-        genKeyIntent.putExtra(GenerateKeysIntentService.EXTRA_EMAIL, email);
-        genKeyIntent.putExtra(GenerateKeysIntentService.EXTRA_PWD, password);
+        genKeyIntent.putExtra(GenerateKeysIntentService.EMAIL_IN, email);
+        genKeyIntent.putExtra(GenerateKeysIntentService.PASSWORD_IN, password);
         startService(genKeyIntent);
     }
     
@@ -132,7 +132,7 @@ public class RegisterActivity extends Activity {
     }
     
     /**
-     * 
+     * Broadcast receiver called when key generation is complete.
      * @author Gustav
      *
      */
@@ -142,9 +142,9 @@ public class RegisterActivity extends Activity {
 
     	@Override
     	public void onReceive(Context context, Intent intent) {
-			final String publicKey = intent.getStringExtra(GenerateKeysIntentService.PUBLIC_KEY);
-			registerUser(publicKey);
 			unregisterReceiver(this);
+			final String publicKey = intent.getStringExtra(GenerateKeysIntentService.PUBLIC_KEY_OUT);
+			registerUser(publicKey);
     	}
 
     }

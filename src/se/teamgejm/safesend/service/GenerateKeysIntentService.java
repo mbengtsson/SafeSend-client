@@ -1,9 +1,5 @@
 package se.teamgejm.safesend.service;
 
-import java.io.IOException;
-
-import se.teamgejm.safesend.activities.RegisterActivity;
-import se.teamgejm.safesend.activities.OpenMessageActivity.DecryptMessageResponseReciever;
 import se.teamgejm.safesend.activities.RegisterActivity.GenerateKeysResponseReciever;
 import se.teamgejm.safesend.pgp.PgpHelper;
 import android.app.IntentService;
@@ -11,16 +7,16 @@ import android.content.Intent;
 import android.util.Log;
 
 /**
- * 
+ * Service for generating keys.
  * @author Gustav
  *
  */
 public class GenerateKeysIntentService extends IntentService {
 	
-	public static final String EXTRA_EMAIL = "email";
-	public static final String EXTRA_PWD = "password";
+	public static final String EMAIL_IN = "email";
+	public static final String PASSWORD_IN = "password";
 	
-	public static final String PUBLIC_KEY = "public_key";
+	public static final String PUBLIC_KEY_OUT = "public_key";
 	
 	private static final String TAG = "GenerateKeysIntentService";
 
@@ -31,23 +27,17 @@ public class GenerateKeysIntentService extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		Log.d(TAG, "OnHandleIntent");
-		final String email = intent.getStringExtra(EXTRA_EMAIL);
-		final String pwd = intent.getStringExtra(EXTRA_PWD);
+		final String email = intent.getStringExtra(EMAIL_IN);
+		final String pwd = intent.getStringExtra(PASSWORD_IN);
 		
-		PgpHelper.generateKeyPair(getApplicationContext(), email, pwd);
+		// Generate the keys
+		String publicKey = PgpHelper.generateKeyPair(getApplicationContext(), email, pwd);
 		
-		String publicKey = null;
-		
-		try {
-			publicKey = PgpHelper.fileToString(PgpHelper.KEY_PUBLIC, getApplicationContext());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+		// Send to broadcast receiver
 		Intent broadcastIntent = new Intent();
 		broadcastIntent.setAction(GenerateKeysResponseReciever.ACTION_RESP);
 		broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-		broadcastIntent.putExtra(PUBLIC_KEY, publicKey);
+		broadcastIntent.putExtra(PUBLIC_KEY_OUT, publicKey);
 		sendBroadcast(broadcastIntent);
 	}
 

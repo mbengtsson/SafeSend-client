@@ -3,6 +3,7 @@ package se.teamgejm.safesend.activities;
 import java.text.DateFormat;
 import java.util.Date;
 
+import org.spongycastle.openpgp.PGPPublicKey;
 import org.spongycastle.util.encoders.Base64;
 
 import se.teamgejm.safesend.R;
@@ -87,12 +88,9 @@ public class OpenMessageActivity extends Activity {
     public void onEvent(MessageByIdSuccessfulEvent event) {
     	getIncomingMessage().setMessage(event.getMessage());
     	
-    	final String publicKey = event.getSenderPublicKey();
+    	byte[] publicKey = event.getSenderPublicKey().getBytes();
     	
-    	byte[] decodedPublicKey = Base64.decode(publicKey.getBytes());
-    	PgpHelper.createFile(getApplicationContext(), decodedPublicKey, PgpHelper.KEY_PUBLIC);
-    	
-    	decryptAndVerify(getIncomingMessage().getMessage());
+    	decryptAndVerify(getIncomingMessage().getMessage(), publicKey);
     }
     
     public void onEvent(MessageByIdFailedEvent event) {
@@ -103,10 +101,11 @@ public class OpenMessageActivity extends Activity {
     /**
      * Decrypt and verify the encrypted message
      */
-    private void decryptAndVerify(String encryptedMessage) {
+    private void decryptAndVerify(String encryptedMessage, byte[] publicKey) {
     	statusMessage.setText(R.string.status_decrypting);
         Intent decryptIntent = new Intent(this, DecryptMessageIntentService.class);
         decryptIntent.putExtra(DecryptMessageIntentService.MESSAGE_IN, encryptedMessage);
+        decryptIntent.putExtra(DecryptMessageIntentService.KEY_PUBLIC_IN, publicKey);
         startService(decryptIntent);
     }
 	

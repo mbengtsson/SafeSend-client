@@ -10,6 +10,7 @@ import java.security.NoSuchProviderException;
 import java.util.Iterator;
 
 /**
+ * Utility class for frequently used help-methods by PGP classes.
  * 
  * @author Gustav
  *
@@ -29,15 +30,10 @@ public class PgpUtils {
      * Search a secret key ring collection for a secret key corresponding to keyID if it
      * exists.
      *
-     * @param pgpSec
-     *         a secret key ring collection.
-     * @param keyID
-     *         keyID we want.
-     * @param pass
-     *         passphrase to decrypt secret key with.
-     *
+     * @param pgpSec a secret key ring collection.
+     * @param keyID keyID we want.
+     * @param pass passphrase to decrypt secret key with.
      * @return the private key.
-     *
      * @throws PGPException
      * @throws NoSuchProviderException
      */
@@ -52,33 +48,19 @@ public class PgpUtils {
         return pgpSecKey.extractPrivateKey(new JcePBESecretKeyDecryptorBuilder().setProvider("BC").build(pass));
     }
 
-    public static PGPPublicKey readPublicKey (Context context, String fileName) throws IOException, PGPException {
-        InputStream keyIn = context.openFileInput(fileName);
-        PGPPublicKey pubKey = readPublicKey(keyIn);
-        keyIn.close();
-        return pubKey;
-    }
-
     /**
      * A simple routine that opens a key ring file and loads the first available key
      * suitable for encryption.
      *
-     * @param input
-     *         data stream containing the public key data
-     *
+     * @param input data stream containing the public key data
      * @return the first public key found.
      *
      * @throws IOException
      * @throws PGPException
      */
-    static PGPPublicKey readPublicKey (InputStream input) throws IOException, PGPException {
+    public static PGPPublicKey readPublicKey (InputStream input) throws IOException, PGPException {
         PGPPublicKeyRingCollection pgpPub = new PGPPublicKeyRingCollection(
                 PGPUtil.getDecoderStream(input), new JcaKeyFingerprintCalculator());
-
-        //
-        // we just loop through the collection till we find a key suitable for encryption, in the real
-        // world you would probably want to be a bit smarter about this.
-        //
 
         Iterator<?> keyRingIter = pgpPub.getKeyRings();
         while (keyRingIter.hasNext()) {
@@ -108,24 +90,14 @@ public class PgpUtils {
      * A simple routine that opens a key ring file and loads the first available key
      * suitable for signature generation.
      *
-     * @param input
-     *         stream to read the secret key ring collection from.
-     *
+     * @param input stream to read the secret key ring collection from.
      * @return a secret key.
-     *
-     * @throws IOException
-     *         on a problem with using the input stream.
-     * @throws PGPException
-     *         if there is an issue parsing the input stream.
+     * @throws IOException on a problem with using the input stream.
+     * @throws PGPException if there is an issue parsing the input stream.
      */
     static PGPSecretKey readSecretKey (InputStream input) throws IOException, PGPException {
         PGPSecretKeyRingCollection pgpSec = new PGPSecretKeyRingCollection(
                 PGPUtil.getDecoderStream(input), new JcaKeyFingerprintCalculator());
-
-        //
-        // we just loop through the collection till we find a key suitable for encryption, in the real
-        // world you would probably want to be a bit smarter about this.
-        //
 
         Iterator<?> keyRingIter = pgpSec.getKeyRings();
         while (keyRingIter.hasNext()) {
