@@ -28,7 +28,7 @@ import java.util.List;
 public class MainActivity extends Activity {
 
     private DbUserDao dbUserDao;
-    private DbMessageDao dbMessageDao;
+
 
     private ListView userListView;
     private UserAdapter adapter;
@@ -52,9 +52,9 @@ public class MainActivity extends Activity {
             public void onItemClick (AdapterView<?> parent, View view, int pos, long id) {
                 final User user = adapter.getUser(pos);
                 Log.d("WTF", user.toString());
-//                final Intent intent = new Intent(getActivity(), SendMessageActivity.class);
-//                intent.putExtra(SendMessageActivity.INTENT_RECEIVER, user);
-//                startActivity(intent);
+                final Intent intent = new Intent(getApplicationContext(), ListMessagesActivity.class);
+                intent.putExtra(ListMessagesActivity.INTENT_RECEIVER, user);
+                startActivity(intent);
             }
         });
     }

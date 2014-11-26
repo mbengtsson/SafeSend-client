@@ -39,6 +39,7 @@
                 android:label="@string/app_name">
         </activity>
         <activity android:name=".activities.RegisterActivity"/>
+        <activity android:name=".activities.ListMessagesActivity"/>
 
         <service android:name=".service.EncryptMessageIntentService"/>
         <service android:name=".service.DecryptMessageIntentService"/>

@@ -7,6 +7,10 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import se.teamgejm.safesend.database.SafeSendSqlHelper;
 import se.teamgejm.safesend.entities.Message;
+import se.teamgejm.safesend.entities.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Emil Stjerneman
@@ -45,23 +49,22 @@ public class DbMessageDao {
         return newMessage;
     }
 
-    //    public List<Comment> getAllComments () {
-    //        List<Comment> comments = new ArrayList<Comment>();
-    //
-    //        Cursor cursor = database.query(MySQLiteHelper.TABLE_COMMENTS,
-    //                allColumns, null, null, null, null, null);
-    //
-    //        cursor.moveToFirst();
-    //        while (!cursor.isAfterLast()) {
-    //            Comment comment = cursorToComment(cursor);
-    //            comments.add(comment);
-    //            cursor.moveToNext();
-    //        }
-    //        // make sure to close the cursor
-    //        cursor.close();
-    //        return comments;
-    //    }
-    //
+    public List<Message> getAllMessage(long userId) {
+        List<Message> messages = new ArrayList<>();
+
+        Cursor cursor = database.rawQuery("SELECT m.* FROM messages m WHERE m.senderId = ? OR m.receiverId = ?", new String[]{String.valueOf(userId), String.valueOf(userId)});
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            Message message = cursorToMessage(cursor);
+            messages.add(message);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return messages;
+    }
+
+
     private Message cursorToMessage (Cursor cursor) {
         Message message = new Message();
         message.setId(cursor.getLong(0));

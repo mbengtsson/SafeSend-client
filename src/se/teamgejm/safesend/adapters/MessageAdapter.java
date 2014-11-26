@@ -42,7 +42,7 @@ public class MessageAdapter extends BaseAdapter {
 	public MessageAdapter(Activity context) {
 		super();
 		this.mContext = context;
-		this.mItems = new ArrayList<Message>();
+		this.mItems = new ArrayList<>();
 	}
 	
 	/**
@@ -118,7 +118,7 @@ public class MessageAdapter extends BaseAdapter {
         
         Date date = new Date(message.getTimeStamp());
 
-        holder.username.setText(message.getSender().getDisplayName());
+        //holder.username.setText(message.getSender().getDisplayName());
         holder.timestamp.setText(DateFormat.getDateInstance().format(date));
         holder.messageType.setText(message.getMessageType().getNiceName());
 
