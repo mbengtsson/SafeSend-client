@@ -17,8 +17,6 @@ import se.teamgejm.safesend.adapters.UserAdapter;
 import se.teamgejm.safesend.database.dao.DbMessageDao;
 import se.teamgejm.safesend.database.dao.DbUserDao;
 import se.teamgejm.safesend.entities.User;
-import se.teamgejm.safesend.service.DecryptMessageIntentService;
-import se.teamgejm.safesend.service.TestIntentService;
 
 import java.security.Security;
 import java.util.ArrayList;
