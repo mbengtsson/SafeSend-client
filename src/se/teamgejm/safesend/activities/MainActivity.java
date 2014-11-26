@@ -4,13 +4,16 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.database.dao.DbMessageDao;
 import se.teamgejm.safesend.database.dao.DbUserDao;
+import se.teamgejm.safesend.entities.User;
 
 import java.security.Security;
+import java.util.List;
 
 /**
  * @author Gustav
@@ -33,8 +36,11 @@ public class MainActivity extends Activity {
         dbUserDao = new DbUserDao(this);
         dbUserDao.open();
 
-        dbMessageDao = new DbMessageDao(this);
-        dbMessageDao.open();
+        final List<User> usersWithMessages = dbUserDao.getUsersWithMessages();
+
+        for (User u : usersWithMessages) {
+            Log.d("Users", u.toString());
+        }
     }
 
     @Override

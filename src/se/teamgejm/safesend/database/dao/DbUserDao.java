@@ -56,13 +56,29 @@ public class DbUserDao {
     public User getUser (long userId) {
         Cursor cursor = database.rawQuery("SELECT * FROM users WHERE userId = ?", new String[]{String.valueOf(userId)});
         cursor.moveToFirst();
-        Log.d("RESTULS", "" + cursor.getCount());
         if (cursor.getCount() == 0) {
             return null;
         }
         User newUser = cursorToUser(cursor);
         cursor.close();
         return newUser;
+    }
+
+    public List<User> getUsersWithMessages () {
+        Cursor cursor = database.rawQuery("SELECT u.*, COUNT(m._id) xm FROM users u INNER JOIN messages m ON (m.senderId = u.userId OR m.receiverId = u.userId) GROUP BY u._id HAVING xm > 0", new String[]{});
+        cursor.moveToFirst();
+        Log.d("RESTULS getUsersWithMessages", "" + cursor.getCount());
+        if (cursor.getCount() == 0) {
+            return new ArrayList<>();
+        }
+        List<User> users = new ArrayList<>();
+        while (!cursor.isAfterLast()) {
+            User user = cursorToUser(cursor);
+            users.add(user);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return users;
     }
 
     public List<User> getAllUsers () {
