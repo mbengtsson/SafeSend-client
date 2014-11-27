@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 import se.teamgejm.safesend.database.SafeSendSqlHelper;
 import se.teamgejm.safesend.entities.User;
 
@@ -34,8 +33,8 @@ public class DbUserDao {
 
     public User addUser (User user) {
         final User userFromDb = getUser(user.getUserId());
+
         if (userFromDb != null) {
-            Log.d("SAVED USER", userFromDb.toString());
             return userFromDb;
         }
 
@@ -67,10 +66,11 @@ public class DbUserDao {
     public List<User> getUsersWithMessages () {
         Cursor cursor = database.rawQuery("SELECT u.*, COUNT(m._id) xm FROM users u INNER JOIN messages m ON (m.senderId = u.userId OR m.receiverId = u.userId) GROUP BY u._id HAVING xm > 0", new String[]{});
         cursor.moveToFirst();
-        Log.d("RESTULS getUsersWithMessages", "" + cursor.getCount());
+
         if (cursor.getCount() == 0) {
             return new ArrayList<>();
         }
+
         List<User> users = new ArrayList<>();
         while (!cursor.isAfterLast()) {
             User user = cursorToUser(cursor);
@@ -97,12 +97,12 @@ public class DbUserDao {
     }
 
     private User cursorToUser (Cursor cursor) {
-        User user = new User();
-        user.setId(cursor.getLong(0));
-        user.setUserId(cursor.getLong(1));
-        user.setEmail(cursor.getString(2));
-        user.setDisplayName(cursor.getString(3));
-        user.setPublicKey(cursor.getString(4));
-        return user;
+        final long id = cursor.getLong(cursor.getColumnIndex("_id"));
+        final long userId = cursor.getLong(cursor.getColumnIndex("userId"));
+        final String email = cursor.getString(cursor.getColumnIndex("email"));
+        final String displayName = cursor.getString(cursor.getColumnIndex("displayName"));
+        final String publicKey = cursor.getString(cursor.getColumnIndex("publicKey"));
+
+        return new User(id, userId, email, displayName, publicKey);
     }
 }

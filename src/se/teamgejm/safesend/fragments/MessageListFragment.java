@@ -45,7 +45,7 @@ public class MessageListFragment extends Fragment {
         messageListView = (ListView) view.findViewById(R.id.message_listview);
         setOnItemClickListeners();
         setListViewHeader();
-        
+
         messageListProgressBar = (ProgressBar) view.findViewById(R.id.message_list_progress_bar);
 
         adapter = new MessageAdapter(getActivity());
@@ -69,9 +69,9 @@ public class MessageListFragment extends Fragment {
 		});
 		messageListView.addHeaderView(btn);
 	}
-	
-	
-    
+
+
+
     @Override
     public void onStart () {
         super.onStart();

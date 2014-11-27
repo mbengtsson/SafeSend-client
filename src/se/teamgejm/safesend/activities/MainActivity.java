@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,23 +15,25 @@ import se.teamgejm.safesend.database.dao.DbUserDao;
 import se.teamgejm.safesend.entities.User;
 
 import java.security.Security;
-import java.util.List;
 
 /**
  * @author Gustav
  */
 public class MainActivity extends Activity {
 
+    private final static String TAG = "MainActivity";
+
     private DbUserDao dbUserDao;
 
-
     private ListView userListView;
+
     private UserAdapter adapter;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
 
         final ActionBar actionBar = getActionBar();
@@ -47,7 +48,7 @@ public class MainActivity extends Activity {
             @Override
             public void onItemClick (AdapterView<?> parent, View view, int pos, long id) {
                 final User user = adapter.getUser(pos);
-                Log.d("WTF", user.toString());
+
                 final Intent intent = new Intent(getApplicationContext(), ListMessagesActivity.class);
                 intent.putExtra(ListMessagesActivity.INTENT_RECEIVER, user);
                 startActivity(intent);
@@ -62,15 +63,20 @@ public class MainActivity extends Activity {
         dbUserDao = new DbUserDao(this);
         dbUserDao.open();
 
-        final List<User> usersWithMessages = dbUserDao.getUsersWithMessages();
-
         adapter.clearUsers();
 
-        for (User u : usersWithMessages) {
-            adapter.addUser(u);
+        for (final User user : dbUserDao.getUsersWithMessages()) {
+            adapter.addUser(user);
         }
 
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onPause () {
+        super.onPause();
+
+        dbUserDao.close();
     }
 
     @Override

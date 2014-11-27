@@ -40,6 +40,8 @@ public class SendMessageActivity extends Activity {
     public static final String INTENT_RECEIVER = "receiver";
     public static final int ACTION_SEND_MESSAGE = R.id.action_send_message;
 
+    private EncryptMessageResponseReciever encryptMessageResponseReciever = new EncryptMessageResponseReciever();
+
     private User receiver;
 
     private DbUserDao dbUserDao;
@@ -55,12 +57,9 @@ public class SendMessageActivity extends Activity {
     private ProgressBar progressBar;
     private TextView statusMessage;
 
-    private Button sendBtn;
-    private RelativeLayout sendForm;
+    private TextView messageText;
 
-    private TextView messageTextView;
-
-    private String message;
+    private String stringToSend;
 
 
     @Override
@@ -69,7 +68,11 @@ public class SendMessageActivity extends Activity {
         setContentView(R.layout.activity_send_message);
 
         final ActionBar actionBar = getActionBar();
-        actionBar.setTitle("Send message");
+        if (actionBar != null) {
+            actionBar.setTitle("Send message");
+        }
+
+        registerResponseReciever();
 
         composeContainer = (LinearLayout) findViewById(R.id.composeContainer);
         progressContainer = (LinearLayout) findViewById(R.id.progressContainer);
@@ -93,14 +96,8 @@ public class SendMessageActivity extends Activity {
             }
         });
 
-        messageTextView = (TextView) findViewById(R.id.message_text);
-        messageTextView.setMovementMethod(new ScrollingMovementMethod());
-
-        setOnClickListeners();
-
-        if (getIntent().hasExtra(INTENT_RECEIVER)) {
-            setReceiver((User) getIntent().getSerializableExtra(INTENT_RECEIVER));
-        }
+        messageText = (TextView) findViewById(R.id.message_text);
+        messageText.setMovementMethod(new ScrollingMovementMethod());
 
         dbMessageDao = new DbMessageDao(this);
         dbMessageDao.open();
@@ -110,7 +107,23 @@ public class SendMessageActivity extends Activity {
 
         statusMessage.setText("Loading users.");
         showProgress();
-        FetchUserList.call();
+
+        if (getIntent().hasExtra(INTENT_RECEIVER)) {
+            setReceiver((User) getIntent().getSerializableExtra(INTENT_RECEIVER));
+        }
+        else {
+            FetchUserList.call();
+        }
+    }
+
+    @Override
+    protected void onDestroy () {
+        super.onDestroy();
+
+        unregisterReceiver(encryptMessageResponseReciever);
+
+        dbMessageDao.close();
+        dbUserDao.close();
     }
 
     @Override
@@ -137,13 +150,11 @@ public class SendMessageActivity extends Activity {
 
         switch (id) {
             case ACTION_SEND_MESSAGE:
-                Log.d(TAG, "Send button clicked");
-                message = messageTextView.getText().toString();
-                if (message.isEmpty()) {
+                stringToSend = messageText.getText().toString();
+                if (stringToSend.isEmpty()) {
                     Toast.makeText(getApplicationContext(), getString(R.string.empty_message), Toast.LENGTH_SHORT).show();
                     return false;
                 }
-                showProgress();
                 getReceiverPublicKey();
                 return true;
         }
@@ -158,10 +169,15 @@ public class SendMessageActivity extends Activity {
 
     public void onEvent (UserListSuccessEvent event) {
         adapter.clearUsers();
-        for (User user : event.getUsers()) {
+        for (final User user : event.getUsers()) {
             adapter.addUser(user);
         }
         adapter.notifyDataSetChanged();
+        hideProgress();
+    }
+
+    public void onEvent (UserPubkeyFailedEvent event) {
+        Toast.makeText(getApplicationContext(), getString(R.string.failed_pub_key), Toast.LENGTH_SHORT).show();
         hideProgress();
     }
 
@@ -171,8 +187,9 @@ public class SendMessageActivity extends Activity {
         signAndEncrypt(getReceiver().getPublicKey().getBytes());
     }
 
-    public void onEvent (UserPubkeyFailedEvent event) {
-        Toast.makeText(getApplicationContext(), getString(R.string.failed_pub_key), Toast.LENGTH_SHORT).show();
+    public void onEvent (SendMessageFailedEvent event) {
+        Toast.makeText(getApplicationContext(), getString(R.string.failed_send_message), Toast.LENGTH_SHORT).show();
+        getApplicationContext().deleteFile(PgpHelper.MESSAGE_ENCRYPTED);
         hideProgress();
     }
 
@@ -180,68 +197,36 @@ public class SendMessageActivity extends Activity {
         Toast.makeText(getApplicationContext(), getString(R.string.success_send_message), Toast.LENGTH_SHORT).show();
         getApplicationContext().deleteFile(PgpHelper.MESSAGE_ENCRYPTED);
 
-        Log.d("RECEIVER", getReceiver().toString());
-
         final User receiver = dbUserDao.addUser(getReceiver());
 
-        Message message = new Message();
-        message.setSender(null);
-        message.setReceiver(getReceiver());
-        message.setTimeStamp(System.currentTimeMillis() / 1000);
-        message.setMessage(this.message);
-        dbMessageDao.addMessage(message);
+        dbMessageDao.addMessage(new Message(0, null, receiver, null, 0, stringToSend, System.currentTimeMillis() / 1000, Message.STATUS_DECRYPTED));
 
         hideProgress();
     }
 
-    public void onEvent (SendMessageFailedEvent event) {
-        Toast.makeText(getApplicationContext(), getString(R.string.failed_send_message), Toast.LENGTH_SHORT).show();
-        getApplicationContext().deleteFile(PgpHelper.MESSAGE_ENCRYPTED);
-        hideProgress();
-    }
 
     /**
      * Sign and encrypt the message
      */
-    private void signAndEncrypt (byte[] publicKey) {
+    private void signAndEncrypt (byte[] receiverPublicKey) {
         statusMessage.setText(R.string.status_encrypting);
 
-        Log.d(TAG, "Message : " + message);
-
-        registerResponseReciever();
+        Log.d(TAG, "Message to encrypt : " + stringToSend);
 
         Intent encryptIntent = new Intent(this, EncryptMessageIntentService.class);
-        encryptIntent.putExtra(EncryptMessageIntentService.MESSAGE_IN, message);
-        encryptIntent.putExtra(EncryptMessageIntentService.KEY_PUBLIC_IN, publicKey);
+        encryptIntent.putExtra(EncryptMessageIntentService.MESSAGE_IN, stringToSend);
+        encryptIntent.putExtra(EncryptMessageIntentService.RECEIVER_KEY_PUBLIC, receiverPublicKey);
         startService(encryptIntent);
-    }
-
-    private void setOnClickListeners () {
-        //        sendBtn = (Button) findViewById(R.id.message_send_button);
-        //        sendBtn.setOnClickListener(new OnClickListener() {
-        //
-        //            @Override
-        //            public void onClick (View v) {
-        //                Log.d(TAG, "Send button clicked");
-        //                final TextView text = (TextView) findViewById(R.id.message_text);
-        //                message = text.getText().toString();
-        //                if (message.isEmpty()) {
-        //                    Toast.makeText(getApplicationContext(), getString(R.string.empty_message), Toast.LENGTH_SHORT).show();
-        //                    return;
-        //                }
-        //                showProgress();
-        //                getReceiverPublicKey();
-        //            }
-        //        });
     }
 
     private void registerResponseReciever () {
         IntentFilter filter = new IntentFilter(EncryptMessageResponseReciever.ACTION_RESP);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(new EncryptMessageResponseReciever(), filter);
+        registerReceiver(encryptMessageResponseReciever, filter);
     }
 
     private void getReceiverPublicKey () {
+        showProgress();
         Log.d(TAG, "Getting public key");
         statusMessage.setText(R.string.status_get_pubkey);
         FetchUserKey.call(getReceiver().getUserId());
@@ -274,7 +259,7 @@ public class SendMessageActivity extends Activity {
 
         @Override
         public void onReceive (Context context, Intent intent) {
-            unregisterReceiver(this);
+
             String encryptedMessage = intent.getStringExtra(EncryptMessageIntentService.MESSAGE_OUT);
             Log.d(TAG, "Encrypted message:" + encryptedMessage);
 
@@ -291,6 +276,5 @@ public class SendMessageActivity extends Activity {
             sendMessageRequest.setReceiverId(getReceiver().getUserId());
             SendMessage.call(sendMessageRequest);
         }
-
     }
 }

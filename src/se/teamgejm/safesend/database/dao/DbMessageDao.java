@@ -48,7 +48,7 @@ public class DbMessageDao {
         return newMessage;
     }
 
-    public List<Message> getAllMessage(long userId) {
+    public List<Message> getAllMessage (long userId) {
         List<Message> messages = new ArrayList<>();
 
         Cursor cursor = database.rawQuery("SELECT m.* FROM messages m WHERE m.senderId = ? OR m.receiverId = ?", new String[]{String.valueOf(userId), String.valueOf(userId)});
@@ -65,12 +65,13 @@ public class DbMessageDao {
 
 
     private Message cursorToMessage (Cursor cursor) {
-        Message message = new Message();
-        message.setId(cursor.getLong(0));
+        final long id = cursor.getLong(cursor.getColumnIndex("_id"));
+        final long senderId = cursor.getLong(cursor.getColumnIndex("senderId"));
+        final long receiverId = cursor.getLong(cursor.getColumnIndex("receiverId"));
+        final String message = cursor.getString(cursor.getColumnIndex("message"));
+        final long dateTime = cursor.getLong(cursor.getColumnIndex("dateTime"));
 
-        message.setMessage(cursor.getString(3));
-        message.setTimeStamp(cursor.getLong(4));
 
-        return message;
+        return new Message(id, null, null, null, 0, message, dateTime, Message.STATUS_DECRYPTED);
     }
 }

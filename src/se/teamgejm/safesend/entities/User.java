@@ -1,56 +1,52 @@
 package se.teamgejm.safesend.entities;
 
-import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-@SuppressWarnings("serial")
 public class User implements Comparable<User>, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private transient long id;
 
     @SerializedName("id")
     private long userId;
 
+    @SerializedName("email")
     private String email;
+
+    @SerializedName("displayName")
     private String displayName;
+
+    @SerializedName("publicKey")
     private String publicKey;
 
     public User () {
+    }
 
+    public User (long id, long userId, String email, String displayName, String publicKey) {
+        this.id = id;
+        this.userId = userId;
+        this.email = email;
+        this.displayName = displayName;
+        this.publicKey = publicKey;
     }
 
     public long getId () {
         return id;
     }
 
-    public void setId (long id) {
-        this.id = id;
-    }
-
     public long getUserId () {
         return userId;
-    }
-
-    public void setUserId (long userId) {
-        this.userId = userId;
     }
 
     public String getEmail () {
         return email;
     }
 
-    public void setEmail (String email) {
-        this.email = email;
-    }
-
     public String getDisplayName () {
         return displayName;
-    }
-
-    public void setDisplayName (String displayName) {
-        this.displayName = displayName;
     }
 
     public String getPublicKey () {

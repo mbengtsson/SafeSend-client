@@ -1,70 +1,73 @@
 package se.teamgejm.safesend.entities;
 
-import se.teamgejm.safesend.enums.MessageType;
+import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
 /**
  * @author Gustav
  */
-@SuppressWarnings("serial")
 public class Message implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public final static int STATUS_ENCRYPTED = 0;
     public final static int STATUS_DECRYPTED = 1;
 
+    private transient long id;
 
-    private long id;
+    @SerializedName("sender")
+    private User sender;
+
+    @SerializedName("receiver")
+    private User receiver;
+
+    @SerializedName("senderPublicKey")
+    private String senderPublicKey;
+
+    @SerializedName("id")
     private long messageId;
-    private long timeStamp;
-    private MessageType messageType;
+
+    @SerializedName("message")
     private String message;
 
-    private User sender;
-    private User receiver;
+    @SerializedName("timeStamp")
+    private long timeStamp;
 
     private int status;
 
     public Message () {
-        setMessageType(MessageType.TEXT);
     }
 
-    public Message (User sender, long timeStamp) {
-        this();
-        setSender(sender);
-        setTimeStamp(timeStamp);
+    public Message (long id, User sender, User receiver, String senderPublicKey, long messageId, String message, long timeStamp, int status) {
+        this.id = id;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.senderPublicKey = senderPublicKey;
+        this.messageId = messageId;
+        this.message = message;
+        this.timeStamp = timeStamp;
+        this.status = status;
     }
 
     public long getId () {
         return id;
     }
 
-    public void setId (long id) {
-        this.id = id;
+    public User getSender () {
+        return sender;
+    }
+
+    public User getReceiver () {
+        return receiver;
+    }
+
+    public String getSenderPublicKey () {
+        return senderPublicKey;
     }
 
     public long getMessageId () {
         return messageId;
-    }
-
-    public void setMessageId (long messageId) {
-        this.messageId = messageId;
-    }
-
-    public long getTimeStamp () {
-        return timeStamp;
-    }
-
-    public void setTimeStamp (long timeStamp) {
-        this.timeStamp = timeStamp;
-    }
-
-    public MessageType getMessageType () {
-        return messageType;
-    }
-
-    public void setMessageType (MessageType messageType) {
-        this.messageType = messageType;
     }
 
     public String getMessage () {
@@ -75,20 +78,8 @@ public class Message implements Serializable {
         this.message = message;
     }
 
-    public User getSender () {
-        return sender;
-    }
-
-    public void setSender (User sender) {
-        this.sender = sender;
-    }
-
-    public User getReceiver () {
-        return receiver;
-    }
-
-    public void setReceiver (User receiver) {
-        this.receiver = receiver;
+    public long getTimeStamp () {
+        return timeStamp;
     }
 
     public int getStatus () {
@@ -103,12 +94,12 @@ public class Message implements Serializable {
     public String toString () {
         return "Message{" +
                 "id=" + id +
-                ", messageId=" + messageId +
-                ", timeStamp=" + timeStamp +
-                ", messageType=" + messageType +
-                ", message='" + message + '\'' +
                 ", sender=" + sender +
                 ", receiver=" + receiver +
+                ", senderPublicKey='" + senderPublicKey + '\'' +
+                ", messageId=" + messageId +
+                ", message='" + message + '\'' +
+                ", timeStamp=" + timeStamp +
                 ", status=" + status +
                 '}';
     }
