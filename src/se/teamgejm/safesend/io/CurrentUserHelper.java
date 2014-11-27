@@ -2,7 +2,7 @@ package se.teamgejm.safesend.io;
 
 import android.content.Context;
 import android.util.Log;
-import se.teamgejm.safesend.entities.UserCredentials;
+import se.teamgejm.safesend.entities.CurrentUser;
 
 import java.io.*;
 
@@ -12,22 +12,26 @@ import java.io.*;
  *
  * @author Emil Stjerneman
  */
-public class UserCredentialsHelper {
+public class CurrentUserHelper {
 
     private final static String TAG = "UserCredentialsHelper";
 
     public final static String CREDENTIAL_FILE = "session";
 
     /**
-     * Opens the credential file on the file system and returns the
-     * UserCredentials object or null.
+     * Open and read the session file on the local device and sets the details
+     * to the current user singleton.
      */
-    public static void readUserCredentials (Context context) {
+    public static void readCurrentUserDetails (Context context) {
         try {
-            FileInputStream fis = context.openFileInput(UserCredentialsHelper.CREDENTIAL_FILE);
+            FileInputStream fis = context.openFileInput(CurrentUserHelper.CREDENTIAL_FILE);
             ObjectInputStream is = new ObjectInputStream(fis);
-            UserCredentials userCredentials = (UserCredentials) is.readObject();
-            UserCredentials.getInstance().setEmail(userCredentials.getEmail());
+
+            CurrentUser currentUser = (CurrentUser) is.readObject();
+
+            CurrentUser.getInstance().setId(currentUser.getId());
+            CurrentUser.getInstance().setEmail(currentUser.getEmail());
+
             is.close();
             fis.close();
         }
@@ -49,13 +53,13 @@ public class UserCredentialsHelper {
     }
 
     /**
-     * Writes the UserCredentials object to a local file.
+     * Writes the current user details to a local file.
      */
-    public static void writeUserCredentials (Context context) {
+    public static void writeCurrentUserDetails (Context context) {
         try {
-            FileOutputStream fos = context.openFileOutput(UserCredentialsHelper.CREDENTIAL_FILE, Context.MODE_PRIVATE);
+            FileOutputStream fos = context.openFileOutput(CurrentUserHelper.CREDENTIAL_FILE, Context.MODE_PRIVATE);
             ObjectOutputStream os = new ObjectOutputStream(fos);
-            os.writeObject(UserCredentials.getInstance());
+            os.writeObject(CurrentUser.getInstance());
             os.close();
         }
         catch (FileNotFoundException e) {

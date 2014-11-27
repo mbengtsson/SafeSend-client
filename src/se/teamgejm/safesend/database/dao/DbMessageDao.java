@@ -33,12 +33,10 @@ public class DbMessageDao {
 
     public Message addMessage (Message message) {
         ContentValues values = new ContentValues();
-        if (message.getSender() != null) {
-            values.put("senderId", message.getSender().getUserId());
-        }
+        values.put("senderId", message.getSender().getUserId());
         values.put("receiverId", message.getReceiver().getUserId());
         values.put("message", message.getMessage());
-        values.put("dateTime", message.getTimeStamp());
+        values.put("timestamp", message.getTimeStamp());
 
         long insertId = database.insert("messages", null, values);
         Cursor cursor = database.rawQuery("SELECT * FROM messages WHERE _id = ?", new String[]{String.valueOf(insertId)});
@@ -69,9 +67,8 @@ public class DbMessageDao {
         final long senderId = cursor.getLong(cursor.getColumnIndex("senderId"));
         final long receiverId = cursor.getLong(cursor.getColumnIndex("receiverId"));
         final String message = cursor.getString(cursor.getColumnIndex("message"));
-        final long dateTime = cursor.getLong(cursor.getColumnIndex("dateTime"));
+        final long timestamp = cursor.getLong(cursor.getColumnIndex("timestamp"));
 
-
-        return new Message(id, null, null, null, 0, message, dateTime, Message.STATUS_DECRYPTED);
+        return new Message(null, null, message, id, timestamp);
     }
 }

@@ -116,7 +116,7 @@ public class MessageAdapter extends BaseAdapter {
         Date date = new Date(message.getTimeStamp());
 
         //holder.username.setText(message.getSender().getDisplayName());
-        
+
         holder.messageReceivedText.setText(message.getMessage());
         holder.messageSentText.setText(message.getMessage());
 

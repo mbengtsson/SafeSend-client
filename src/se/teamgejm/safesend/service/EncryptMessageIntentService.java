@@ -4,7 +4,7 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
 import org.spongycastle.util.encoders.Base64;
-import se.teamgejm.safesend.activities.SendMessageActivity.EncryptMessageResponseReciever;
+import se.teamgejm.safesend.activities.SendMessageActivity;
 import se.teamgejm.safesend.pgp.PgpHelper;
 
 import java.io.ByteArrayInputStream;
@@ -43,7 +43,7 @@ public class EncryptMessageIntentService extends IntentService {
 
         // Send to broadcast receiver
         Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction(EncryptMessageResponseReciever.ACTION_RESP);
+        broadcastIntent.setAction(SendMessageActivity.EncryptMessageResponseReceiver.ACTION_RESP);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
         broadcastIntent.putExtra(MESSAGE_OUT, encryptedMessage);
         sendBroadcast(broadcastIntent);

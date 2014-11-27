@@ -20,6 +20,7 @@ import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.adapters.UserAdapter;
 import se.teamgejm.safesend.database.dao.DbMessageDao;
 import se.teamgejm.safesend.database.dao.DbUserDao;
+import se.teamgejm.safesend.entities.CurrentUser;
 import se.teamgejm.safesend.entities.Message;
 import se.teamgejm.safesend.entities.User;
 import se.teamgejm.safesend.entities.request.SendMessageRequest;
@@ -40,7 +41,7 @@ public class SendMessageActivity extends Activity {
     public static final String INTENT_RECEIVER = "receiver";
     public static final int ACTION_SEND_MESSAGE = R.id.action_send_message;
 
-    private EncryptMessageResponseReciever encryptMessageResponseReciever = new EncryptMessageResponseReciever();
+    private EncryptMessageResponseReceiver encryptMessageResponseReceiver = new EncryptMessageResponseReceiver();
 
     private User receiver;
 
@@ -120,7 +121,7 @@ public class SendMessageActivity extends Activity {
     protected void onDestroy () {
         super.onDestroy();
 
-        unregisterReceiver(encryptMessageResponseReciever);
+        unregisterReceiver(encryptMessageResponseReceiver);
 
         dbMessageDao.close();
         dbUserDao.close();
@@ -199,7 +200,7 @@ public class SendMessageActivity extends Activity {
 
         final User receiver = dbUserDao.addUser(getReceiver());
 
-        dbMessageDao.addMessage(new Message(0, null, receiver, null, 0, stringToSend, System.currentTimeMillis() / 1000, Message.STATUS_DECRYPTED));
+        dbMessageDao.addMessage(new Message(CurrentUser.getInstance(), receiver, stringToSend));
 
         hideProgress();
     }
@@ -220,9 +221,9 @@ public class SendMessageActivity extends Activity {
     }
 
     private void registerResponseReciever () {
-        IntentFilter filter = new IntentFilter(EncryptMessageResponseReciever.ACTION_RESP);
+        IntentFilter filter = new IntentFilter(EncryptMessageResponseReceiver.ACTION_RESP);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(encryptMessageResponseReciever, filter);
+        registerReceiver(encryptMessageResponseReceiver, filter);
     }
 
     private void getReceiverPublicKey () {
@@ -253,7 +254,7 @@ public class SendMessageActivity extends Activity {
     /**
      * @author Gustav
      */
-    public class EncryptMessageResponseReciever extends BroadcastReceiver {
+    public class EncryptMessageResponseReceiver extends BroadcastReceiver {
 
         public static final String ACTION_RESP = "se.teamgejm.intent.action.MESSAGE_PROCESSED";
 

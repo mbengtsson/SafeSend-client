@@ -9,11 +9,11 @@ public class UserTable {
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = "CREATE TABLE users ("
-            + "_id INTEGER PRIMARY KEY AUTOINCREMENT,"
-            + "userId INT,"
-            + "email VARCHAR(255),"
-            + "displayName VARCHAR(255),"
-            + "publicKey TEXT"
+            + "`_id` INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + "`userId` INT,"
+            + "`email` VARCHAR(255),"
+            + "`displayName` VARCHAR(255),"
+            + "`publicKey` TEXT"
             + ");";
 
     public static void onCreate (SQLiteDatabase db) {

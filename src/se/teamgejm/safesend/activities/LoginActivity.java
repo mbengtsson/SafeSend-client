@@ -7,11 +7,11 @@ import android.view.View;
 import android.widget.*;
 import de.greenrobot.event.EventBus;
 import se.teamgejm.safesend.R;
-import se.teamgejm.safesend.entities.UserCredentials;
+import se.teamgejm.safesend.entities.CurrentUser;
 import se.teamgejm.safesend.entities.request.ValidateCredentialsRequest;
 import se.teamgejm.safesend.events.UserCredentialsFailedEvent;
 import se.teamgejm.safesend.events.UserCredentialsSuccessEvent;
-import se.teamgejm.safesend.io.UserCredentialsHelper;
+import se.teamgejm.safesend.io.CurrentUserHelper;
 import se.teamgejm.safesend.rest.ValidateCredentials;
 
 import java.util.Arrays;
@@ -54,14 +54,14 @@ public class LoginActivity extends Activity {
             @Override
             public void onClick (View view) {
                 showProgress();
-                ValidateCredentials.call(new ValidateCredentialsRequest(UserCredentials.getInstance().getEmail(), passwordField.getText().toString()));
+                ValidateCredentials.call(new ValidateCredentialsRequest(CurrentUser.getInstance().getEmail(), passwordField.getText().toString()));
             }
         });
 
         progressBar = (ProgressBar) findViewById(R.id.login_progress_bar);
 
-        if (Arrays.asList(getApplicationContext().fileList()).contains(UserCredentialsHelper.CREDENTIAL_FILE)) {
-            UserCredentialsHelper.readUserCredentials(getApplicationContext());
+        if (Arrays.asList(getApplicationContext().fileList()).contains(CurrentUserHelper.CREDENTIAL_FILE)) {
+            CurrentUserHelper.readCurrentUserDetails(getApplicationContext());
         }
     }
 
@@ -69,18 +69,18 @@ public class LoginActivity extends Activity {
     protected void onResume () {
         super.onResume();
 
-        if (UserCredentials.getInstance().getEmail() == null) {
+        if (CurrentUser.getInstance().getEmail() == null) {
             // Showing register container by default.
         }
         // No password means that the user is not logged in.
-        else if (UserCredentials.getInstance().getPassword() == null) {
+        else if (CurrentUser.getInstance().getPassword() == null) {
             registerContainer.setVisibility(View.GONE);
             loginContainer.setVisibility(View.VISIBLE);
         }
         // The user is registered and have a password.
         else {
             showProgress();
-            ValidateCredentials.call(new ValidateCredentialsRequest(UserCredentials.getInstance().getEmail(), UserCredentials.getInstance().getPassword()));
+            ValidateCredentials.call(new ValidateCredentialsRequest(CurrentUser.getInstance().getEmail(), CurrentUser.getInstance().getPassword()));
         }
     }
 
@@ -114,7 +114,7 @@ public class LoginActivity extends Activity {
     public void onEvent (final UserCredentialsFailedEvent event) {
         hideProgress();
         Toast.makeText(this, "Login failed.", Toast.LENGTH_LONG).show();
-        UserCredentials.getInstance().setPassword(null);
+        CurrentUser.getInstance().setPassword(null);
     }
 
     /**
@@ -123,8 +123,8 @@ public class LoginActivity extends Activity {
      * This will happen if the credentials were validated successfully.
      */
     public void onEvent (final UserCredentialsSuccessEvent event) {
-        if (UserCredentials.getInstance().getPassword() == null) {
-            UserCredentials.getInstance().setPassword(passwordField.getText().toString());
+        if (CurrentUser.getInstance().getPassword() == null) {
+            CurrentUser.getInstance().setPassword(passwordField.getText().toString());
         }
         final Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);

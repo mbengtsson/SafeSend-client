@@ -99,12 +99,6 @@ public class ListMessagesActivity extends Activity {
     }
 
     public void onEvent (MessageListSuccessEvent event) {
-        //adapter.clearMessages();
-        //        for (Message message : event.getMessages()) {
-        //            adapter.addMessage(message);
-        //            Log.d(TAG, message.toString());
-        //        }
-        //        adapter.notifyDataSetChanged();
         for (Message message : event.getMessages()) {
             FetchMessageById.call(message.getMessageId());
         }
@@ -166,8 +160,6 @@ public class ListMessagesActivity extends Activity {
                 return;
             }
 
-
-            message.setStatus(Message.STATUS_DECRYPTED);
             dbMessageDao.addMessage(message);
 
             stopLoading();

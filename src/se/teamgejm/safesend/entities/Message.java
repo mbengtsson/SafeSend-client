@@ -14,7 +14,7 @@ public class Message implements Serializable {
     public final static int STATUS_ENCRYPTED = 0;
     public final static int STATUS_DECRYPTED = 1;
 
-    private transient long id;
+    private long _id;
 
     @SerializedName("sender")
     private User sender;
@@ -34,24 +34,28 @@ public class Message implements Serializable {
     @SerializedName("timeStamp")
     private long timeStamp;
 
-    private int status;
-
     public Message () {
     }
 
-    public Message (long id, User sender, User receiver, String senderPublicKey, long messageId, String message, long timeStamp, int status) {
-        this.id = id;
+    public Message (User sender, User receiver, String message) {
         this.sender = sender;
         this.receiver = receiver;
-        this.senderPublicKey = senderPublicKey;
-        this.messageId = messageId;
         this.message = message;
+        this.timeStamp = System.currentTimeMillis() / 1000;
+    }
+
+    public Message (User sender, User receiver, String message, long _id) {
+        this(sender, receiver, message);
+        this._id = _id;
+    }
+
+    public Message (User sender, User receiver, String message, long _id, long timeStamp) {
+        this(sender, receiver, message, _id);
         this.timeStamp = timeStamp;
-        this.status = status;
     }
 
     public long getId () {
-        return id;
+        return _id;
     }
 
     public User getSender () {
@@ -82,25 +86,16 @@ public class Message implements Serializable {
         return timeStamp;
     }
 
-    public int getStatus () {
-        return status;
-    }
-
-    public void setStatus (int status) {
-        this.status = status;
-    }
-
     @Override
     public String toString () {
         return "Message{" +
-                "id=" + id +
+                "_id=" + _id +
                 ", sender=" + sender +
                 ", receiver=" + receiver +
                 ", senderPublicKey='" + senderPublicKey + '\'' +
                 ", messageId=" + messageId +
                 ", message='" + message + '\'' +
                 ", timeStamp=" + timeStamp +
-                ", status=" + status +
                 '}';
     }
 }
