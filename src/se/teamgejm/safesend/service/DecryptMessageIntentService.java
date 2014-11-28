@@ -4,7 +4,6 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
 import org.spongycastle.util.encoders.Base64;
-import se.teamgejm.safesend.activities.ListMessagesActivity.DecryptMessageResponseReceiver;
 import se.teamgejm.safesend.entities.Message;
 import se.teamgejm.safesend.pgp.PgpHelper;
 
@@ -45,11 +44,11 @@ public class DecryptMessageIntentService extends IntentService {
         message.setMessage(messagePlainText);
 
         // Send to broadcast receiver
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction(DecryptMessageResponseReceiver.ACTION_RESP);
-        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.putExtra(MESSAGE_OUT, message);
-        sendBroadcast(broadcastIntent);
+        //        Intent broadcastIntent = new Intent();
+        //        broadcastIntent.setAction(DecryptMessageResponseReceiver.ACTION_RESP);
+        //        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        //        broadcastIntent.putExtra(MESSAGE_OUT, message);
+        //        sendBroadcast(broadcastIntent);
     }
 
 }

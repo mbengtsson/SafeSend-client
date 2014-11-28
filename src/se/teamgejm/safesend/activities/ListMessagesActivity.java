@@ -1,10 +1,7 @@
 package se.teamgejm.safesend.activities;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -12,20 +9,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 import de.greenrobot.event.EventBus;
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.adapters.MessageAdapter;
 import se.teamgejm.safesend.database.dao.DbMessageDao;
 import se.teamgejm.safesend.entities.Message;
 import se.teamgejm.safesend.entities.User;
-import se.teamgejm.safesend.events.MessageByIdFailedEvent;
-import se.teamgejm.safesend.events.MessageByIdSuccessfulEvent;
-import se.teamgejm.safesend.events.MessageListFailedEvent;
-import se.teamgejm.safesend.events.MessageListSuccessEvent;
-import se.teamgejm.safesend.rest.FetchMessageById;
-import se.teamgejm.safesend.rest.FetchMessageList;
-import se.teamgejm.safesend.service.DecryptMessageIntentService;
+import se.teamgejm.safesend.events.MessageFetchingDoneEvent;
+import se.teamgejm.safesend.service.FetchMessagesIntentService;
 
 /**
  * @author Emil Stjerneman
@@ -33,8 +24,6 @@ import se.teamgejm.safesend.service.DecryptMessageIntentService;
 public class ListMessagesActivity extends Activity {
 
     private final static String TAG = "ListMessagesActivity";
-
-    private DecryptMessageResponseReceiver decryptMessageResponseReceiver = new DecryptMessageResponseReceiver();
 
     public final static String INTENT_RECEIVER = "user";
 
@@ -55,8 +44,6 @@ public class ListMessagesActivity extends Activity {
             this.finish();
         }
 
-        registerResponseReciever();
-
         user = (User) getIntent().getSerializableExtra(INTENT_RECEIVER);
 
         messageListProgressBar = (ProgressBar) findViewById(R.id.message_list_progress_bar);
@@ -65,8 +52,8 @@ public class ListMessagesActivity extends Activity {
         adapter = new MessageAdapter(this);
         messageListView.setAdapter(adapter);
 
-        dbMessageDao = new DbMessageDao(this);
-        dbMessageDao.open();
+        Intent intent = new Intent(this, FetchMessagesIntentService.class);
+        startService(intent);
 
         startLoading();
     }
@@ -85,7 +72,7 @@ public class ListMessagesActivity extends Activity {
 
     @Override
     protected void onDestroy () {
-        unregisterReceiver(decryptMessageResponseReceiver);
+        dbMessageDao.close();
         super.onDestroy();
     }
 
@@ -105,89 +92,40 @@ public class ListMessagesActivity extends Activity {
                 intent.putExtra(SendMessageActivity.INTENT_RECEIVER, user);
                 startActivity(intent);
                 return true;
+
+            case R.id.action_update_messages:
+                startService(new Intent(this, FetchMessagesIntentService.class));
+                startLoading();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public void onEvent (MessageListFailedEvent event) {
-        Toast.makeText(this, getString(R.string.failed_message_list), Toast.LENGTH_SHORT).show();
+    public void onEvent (MessageFetchingDoneEvent event) {
         stopLoading();
     }
 
-    public void onEvent (MessageListSuccessEvent event) {
-        for (Message message : event.getMessages()) {
-            FetchMessageById.call(message.getMessageId());
-        }
-
-        if (event.getMessages().size() == 0) {
-            stopLoading();
-        }
-    }
-
-    public void onEvent (MessageByIdSuccessfulEvent event) {
-        decryptAndVerify(event.getMessage());
-    }
-
-    public void onEvent (MessageByIdFailedEvent event) {
-        Toast.makeText(getApplicationContext(), getString(R.string.failed_message_by_id), Toast.LENGTH_SHORT).show();
-        stopLoading();
-    }
 
     private void startLoading () {
         messageListProgressBar.setVisibility(View.VISIBLE);
-        FetchMessageList.call();
     }
 
     private void stopLoading () {
-        messageListProgressBar.setVisibility(View.GONE);
-
         adapter.clearMessages();
 
+        dbMessageDao = new DbMessageDao(this);
+        dbMessageDao.open();
+
         for (Message message : dbMessageDao.getAllMessage(user.getUserId())) {
+            Log.d(TAG, message.toString());
             adapter.addMessage(message);
         }
 
+        dbMessageDao.close();
+
         adapter.notifyDataSetChanged();
-    }
 
-    private void registerResponseReciever () {
-        IntentFilter filter = new IntentFilter(DecryptMessageResponseReceiver.ACTION_RESP);
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(decryptMessageResponseReceiver, filter);
-    }
-
-    /**
-     * Decrypt and verify the encrypted message
-     */
-    private void decryptAndVerify (Message message) {
-        Intent decryptIntent = new Intent(this, DecryptMessageIntentService.class);
-        decryptIntent.putExtra(DecryptMessageIntentService.MESSAGE_IN, message);
-        startService(decryptIntent);
-    }
-
-    /**
-     * @author Gustav
-     */
-    public class DecryptMessageResponseReceiver extends BroadcastReceiver {
-
-        public static final String ACTION_RESP = "se.teamgejm.intent.action.MESSAGE_DECRYPT";
-
-        @Override
-        public void onReceive (Context context, Intent intent) {
-            final Message message = (Message) intent.getSerializableExtra(DecryptMessageIntentService.MESSAGE_OUT);
-
-            if (message == null) {
-                Toast.makeText(getApplicationContext(), getString(R.string.failed_decryption), Toast.LENGTH_SHORT).show();
-                stopLoading();
-                return;
-            }
-
-            Log.d(TAG, "Decrypted message:" + message.toString());
-            dbMessageDao.addMessage(message);
-
-            stopLoading();
-        }
-
+        messageListProgressBar.setVisibility(View.GONE);
     }
 }

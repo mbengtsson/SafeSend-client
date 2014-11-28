@@ -202,6 +202,8 @@ public class SendMessageActivity extends Activity {
 
         final User receiver = dbUserDao.addUser(getReceiver());
 
+        Log.e(TAG, CurrentUser.getInstance().toString());
+
         dbMessageDao.addMessage(new Message(CurrentUser.getInstance(), receiver, stringToSend));
 
         Intent intent = new Intent(this, ListMessagesActivity.class);
@@ -209,6 +211,8 @@ public class SendMessageActivity extends Activity {
         startActivity(intent);
 
         hideProgress();
+
+        this.finish();
     }
 
 

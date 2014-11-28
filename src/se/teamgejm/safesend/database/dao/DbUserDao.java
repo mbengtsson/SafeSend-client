@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import se.teamgejm.safesend.database.SafeSendSqlHelper;
+import se.teamgejm.safesend.entities.CurrentUser;
 import se.teamgejm.safesend.entities.User;
 
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class DbUserDao {
     }
 
     public List<User> getUsersWithMessages () {
-        Cursor cursor = database.rawQuery("SELECT u.*, COUNT(m._id) xm FROM users u INNER JOIN messages m ON (m.senderId = u.userId OR m.receiverId = u.userId) GROUP BY u._id HAVING xm > 0", new String[]{});
+        Cursor cursor = database.rawQuery("SELECT u.*, COUNT(m._id) xm FROM users u INNER JOIN messages m ON (m.senderId = u.userId OR m.receiverId = u.userId) WHERE u.userId != ? GROUP BY u._id HAVING xm > 0", new String[]{String.valueOf(CurrentUser.getInstance().getUserId())});
         cursor.moveToFirst();
 
         if (cursor.getCount() == 0) {

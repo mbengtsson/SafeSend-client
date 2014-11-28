@@ -9,10 +9,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import de.greenrobot.event.EventBus;
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.adapters.UserAdapter;
 import se.teamgejm.safesend.database.dao.DbUserDao;
 import se.teamgejm.safesend.entities.User;
+import se.teamgejm.safesend.events.MessageFetchingDoneEvent;
+import se.teamgejm.safesend.service.FetchMessagesIntentService;
 
 import java.security.Security;
 
@@ -59,19 +62,26 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    public void onStart () {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop () {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+
+    @Override
     protected void onResume () {
         super.onResume();
 
-        dbUserDao = new DbUserDao(this);
-        dbUserDao.open();
+        Intent intent = new Intent(this, FetchMessagesIntentService.class);
+        startService(intent);
+        startLoading();
 
-        adapter.clearUsers();
-
-        for (final User user : dbUserDao.getUsersWithMessages()) {
-            adapter.addUser(user);
-        }
-
-        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -96,9 +106,36 @@ public class MainActivity extends Activity {
                 Intent intent = new Intent(this, SendMessageActivity.class);
                 startActivity(intent);
                 return true;
+
+            case R.id.action_update_messages:
+                startService(new Intent(this, FetchMessagesIntentService.class));
+                startLoading();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    public void onEvent (MessageFetchingDoneEvent event) {
+        stopLoading();
+    }
+
+    private void startLoading () {
+
+    }
+
+    private void stopLoading () {
+        adapter.clearUsers();
+
+        dbUserDao = new DbUserDao(this);
+        dbUserDao.open();
+
+        adapter.clearUsers();
+
+        for (final User user : dbUserDao.getUsersWithMessages()) {
+            adapter.addUser(user);
+        }
+
+        adapter.notifyDataSetChanged();
+    }
 }

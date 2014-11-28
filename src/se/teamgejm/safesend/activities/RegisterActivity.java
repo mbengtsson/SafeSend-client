@@ -11,6 +11,7 @@ import android.widget.*;
 import de.greenrobot.event.EventBus;
 import org.spongycastle.util.encoders.Base64;
 import se.teamgejm.safesend.R;
+import se.teamgejm.safesend.database.dao.DbUserDao;
 import se.teamgejm.safesend.entities.CurrentUser;
 import se.teamgejm.safesend.entities.request.RegisterUserRequest;
 import se.teamgejm.safesend.events.RegisterFailedEvent;
@@ -88,12 +89,20 @@ public class RegisterActivity extends Activity {
         // Get the password from the input field as its not returned by the server.
         final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
 
-        CurrentUser.getInstance().setId(event.getUserResponse().getId());
+        CurrentUser.getInstance().setUserId(event.getUserResponse().getId());
         CurrentUser.getInstance().setEmail(event.getUserResponse().getEmail());
+        CurrentUser.getInstance().setDisplayName(event.getUserResponse().getDisplayName());
         CurrentUser.getInstance().setPassword(password);
 
         // Save user details (not password) to a local file.
         CurrentUserHelper.writeCurrentUserDetails(getApplicationContext());
+
+        DbUserDao dbUserDao = new DbUserDao(this);
+        dbUserDao.open();
+
+        dbUserDao.addUser(CurrentUser.getInstance());
+
+        dbUserDao.close();
 
         this.finish();
     }

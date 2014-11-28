@@ -41,7 +41,7 @@ public class Message implements Serializable {
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
-        this.timeStamp = System.currentTimeMillis() / 1000;
+        this.timeStamp = System.currentTimeMillis();
     }
 
     public Message (User sender, User receiver, String message, long _id) {

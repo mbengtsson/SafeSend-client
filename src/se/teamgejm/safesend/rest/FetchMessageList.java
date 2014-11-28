@@ -1,26 +1,23 @@
 package se.teamgejm.safesend.rest;
 
-import java.util.List;
-
+import android.util.Log;
 import de.greenrobot.event.EventBus;
-
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import se.teamgejm.safesend.entities.Message;
 import se.teamgejm.safesend.events.MessageListFailedEvent;
 import se.teamgejm.safesend.events.MessageListSuccessEvent;
-import android.util.Log;
+
+import java.util.List;
 
 /**
- * 
  * @author Gustav
- *
  */
 public class FetchMessageList {
-	
-	private static final String TAG = "FetchMessageList";
-	
+
+    private static final String TAG = "FetchMessageList";
+
     /**
      * Callback to handle service results.
      */
@@ -38,9 +35,13 @@ public class FetchMessageList {
             EventBus.getDefault().post(new MessageListSuccessEvent(messages));
         }
     };
-    
+
     public static void call () {
-    	ApiManager.getSafesendService().getMessages(FetchMessageList.callback);
+        ApiManager.getSafesendService().getMessages(FetchMessageList.callback);
+    }
+
+    public static List<Message> callSynchronously () {
+        return ApiManager.getSafesendService().getMessagesSynchronously();
     }
 
 }

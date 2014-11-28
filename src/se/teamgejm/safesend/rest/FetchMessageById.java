@@ -35,4 +35,8 @@ public class FetchMessageById {
         ApiManager.getSafesendService().getMessageById(id, FetchMessageById.callback);
     }
 
+    public static Message callSynchronously (long id) {
+        return ApiManager.getSafesendService().getMessageByIdSynchronously(id);
+    }
+
 }
