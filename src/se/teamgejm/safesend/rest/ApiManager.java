@@ -17,14 +17,13 @@ public final class ApiManager {
     private static final RestAdapter REST_ADAPTER_NO_AUTH = new RestAdapter.Builder()
             .setEndpoint(SafeSendConstants.API_URI)
             .setClient(new OkClient(ApiManager.getUnsafeOkHttpClient()))
-            .setLogLevel(RestAdapter.LogLevel.FULL)
+            .setLogLevel(RestAdapter.LogLevel.NONE)
             .build();
 
     private static final RestAdapter REST_ADAPTER_WITH_AUTH = new RestAdapter.Builder()
             .setEndpoint(SafeSendConstants.API_URI)
             .setClient(new OkClient(ApiManager.getUnsafeOkHttpClient()))
-            .setLogLevel(RestAdapter.LogLevel.FULL)
-                    //.setErrorHandler(new RestErrorHandler())
+            .setLogLevel(RestAdapter.LogLevel.NONE)
             .setRequestInterceptor(new SafeSendInterceptor())
             .build();
 

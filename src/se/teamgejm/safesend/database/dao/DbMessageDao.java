@@ -34,8 +34,8 @@ public class DbMessageDao {
     }
 
     public Message addMessage (Message message) {
+        Log.d("DbMessageDao", "addMessage");
         ContentValues values = new ContentValues();
-        Log.e("SENDER", message.getSender().toString());
         values.put("senderId", message.getSender().getUserId());
         values.put("receiverId", message.getReceiver().getUserId());
         values.put("message", message.getMessage());
@@ -54,7 +54,7 @@ public class DbMessageDao {
         List<Message> messages = new ArrayList<>();
 
         //Cursor cursor = database.rawQuery("SELECT m._id as mid, m.*, s._id sid, s.userId suserId, s.email semail, s.displayName sdisplayName, s.publicKey spublicKey, r._id rid, r.userId ruserId, r.email remail, r.displayName rdisplayName, r.publicKey rpublicKey FROM messages m INNER JOIN users s ON m.senderId = s.userId INNER JOIN users r ON m.receiverId = r.userId", new String[]{String.valueOf(userId), String.valueOf(userId)});
-        Cursor cursor = database.rawQuery("SELECT m._id as mid, m.*, s._id sid, s.userId suserId, s.email semail, s.displayName sdisplayName, s.publicKey spublicKey FROM messages m INNER JOIN users s ON m.senderId = s.userId WHERE m.senderId = ? OR m.receiverId = ?", new String[]{String.valueOf(userId), String.valueOf(userId)});
+        Cursor cursor = database.rawQuery("SELECT m._id as mid, m.*, s._id sid, s.userId suserId, s.email semail, s.displayName sdisplayName, s.publicKey spublicKey FROM messages m INNER JOIN users s ON m.senderId = s.userId WHERE m.senderId = ? OR m.receiverId = ? ORDER BY m.timestamp DESC", new String[]{String.valueOf(userId), String.valueOf(userId)});
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Message message = cursorToMessage(cursor);
