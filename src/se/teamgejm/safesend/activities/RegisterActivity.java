@@ -1,5 +1,6 @@
 package se.teamgejm.safesend.activities;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -31,6 +32,8 @@ public class RegisterActivity extends Activity {
 
     private ProgressBar progressBar;
     private LinearLayout registerForm;
+    
+    private GenerateKeysResponseReciever genKeysReceiver;
 
     @Override
     public void onCreate (Bundle savedInstanceState) {
@@ -41,14 +44,16 @@ public class RegisterActivity extends Activity {
         progressBar = (ProgressBar) findViewById(R.id.regsiter_process_bar);
 
         registerForm = (LinearLayout) findViewById(R.id.register_form);
+        
+        final ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(getString(R.string.title_register));
+        }
 
         final Button registerButton = (Button) findViewById(R.id.register_button_register);
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick (View view) {
-                IntentFilter filter = new IntentFilter(GenerateKeysResponseReciever.ACTION_RESP);
-                filter.addCategory(Intent.CATEGORY_DEFAULT);
-                registerReceiver(new GenerateKeysResponseReciever(), filter);
                 showProgress();
                 generateKeyPairs();
             }
@@ -58,12 +63,16 @@ public class RegisterActivity extends Activity {
     @Override
     public void onStart () {
         super.onStart();
+        IntentFilter filter = new IntentFilter(GenerateKeysResponseReciever.ACTION_RESP);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(genKeysReceiver = new GenerateKeysResponseReciever(), filter);
         EventBus.getDefault().register(this);
     }
 
     @Override
     public void onStop () {
         EventBus.getDefault().unregister(this);
+        unregisterReceiver(genKeysReceiver);
         super.onStop();
     }
 
@@ -147,7 +156,6 @@ public class RegisterActivity extends Activity {
 
         @Override
         public void onReceive (Context context, Intent intent) {
-            unregisterReceiver(this);
             final String publicKey = intent.getStringExtra(GenerateKeysIntentService.PUBLIC_KEY_OUT);
             registerUser(publicKey);
         }

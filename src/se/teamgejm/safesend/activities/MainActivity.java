@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
 
         final ActionBar actionBar = getActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setTitle(getString(R.string.title_conversations));
         }
 
         userListView = (ListView) findViewById(R.id.userListView);

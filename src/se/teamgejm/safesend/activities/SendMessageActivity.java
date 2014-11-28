@@ -69,9 +69,6 @@ public class SendMessageActivity extends Activity {
         setContentView(R.layout.activity_send_message);
 
         final ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle("Send message");
-        }
 
         registerResponseReciever();
 
@@ -113,9 +110,15 @@ public class SendMessageActivity extends Activity {
             setReceiver((User) getIntent().getSerializableExtra(INTENT_RECEIVER));
             userSprinner.setVisibility(View.GONE);
             hideProgress();
+            if (actionBar != null) {
+                actionBar.setTitle(getString(R.string.title_send_to) + " " + getReceiver().getDisplayName());
+            }
         }
         else {
             FetchUserList.call();
+            if (actionBar != null) {
+                actionBar.setTitle(getString(R.string.title_send_message));
+            }
         }
     }
 

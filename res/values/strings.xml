@@ -46,6 +46,13 @@
     <string name="action_send_new_message">Send new message</string>
     <string name="action_send_message">Send</string>
     <string name="action_update_messages">Update</string>
+    
+    <string name="title_conversations">Conversations</string>
+    <string name="title_send_message">Send message</string>
+    <string name="title_you_and">You and</string>
+    <string name="title_send_to">Message to</string>
+    <string name="title_login">Login to SafeSend</string>
+    <string name="title_register">Register new account</string>
 
 
 </resources>

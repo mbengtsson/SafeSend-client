@@ -1,5 +1,6 @@
 package se.teamgejm.safesend.activities;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -35,6 +36,11 @@ public class LoginActivity extends Activity {
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        
+        final ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(getString(R.string.title_login));
+        }
 
         loginContainer = (LinearLayout) findViewById(R.id.login_container);
         registerContainer = (LinearLayout) findViewById(R.id.register_container);
