@@ -18,6 +18,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import de.greenrobot.event.EventBus;
 
 /**
@@ -46,6 +48,7 @@ public class MainActivity extends Activity {
         }
 
         userListView = (ListView) findViewById(R.id.userListView);
+        
         adapter = new UserAdapter(this);
         userListView.setAdapter(adapter);
 

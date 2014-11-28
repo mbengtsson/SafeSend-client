@@ -1,16 +1,11 @@
 package se.teamgejm.safesend.activities;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.*;
-import de.greenrobot.event.EventBus;
+import java.security.Security;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.spongycastle.util.encoders.Base64;
+
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.database.dao.DbUserDao;
 import se.teamgejm.safesend.entities.CurrentUser;
@@ -20,8 +15,20 @@ import se.teamgejm.safesend.events.RegisterSuccessEvent;
 import se.teamgejm.safesend.io.CurrentUserHelper;
 import se.teamgejm.safesend.rest.RegisterUser;
 import se.teamgejm.safesend.service.GenerateKeysIntentService;
-
-import java.security.Security;
+import android.app.ActionBar;
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+import de.greenrobot.event.EventBus;
 
 /**
  * @author Emil Stjerneman
@@ -32,6 +39,10 @@ public class RegisterActivity extends Activity {
 
     private ProgressBar progressBar;
     private LinearLayout registerForm;
+    
+    private static final String EMAIL_PATTERN = 
+    		"^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+    		+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
     
     private GenerateKeysResponseReciever genKeysReceiver;
 
@@ -131,6 +142,23 @@ public class RegisterActivity extends Activity {
         final String displayName = ((TextView) findViewById(R.id.register_display_name)).getText().toString();
         final String email = ((TextView) findViewById(R.id.register_email)).getText().toString();
         final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
+        
+        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+        Matcher matcher = pattern.matcher(email);
+        
+        if (displayName == null || displayName.length() < 4) {
+        	Toast.makeText(getApplicationContext(), getString(R.string.register_fail_displayname), Toast.LENGTH_SHORT).show();
+        	hideProgress();
+        	return;
+        } else if (email == null || !matcher.matches()) {
+        	Toast.makeText(getApplicationContext(), getString(R.string.register_fail_email), Toast.LENGTH_SHORT).show();
+        	hideProgress();
+        	return;
+        } else if (password == null || password.length() < 8) {
+        	Toast.makeText(getApplicationContext(), getString(R.string.register_fail_password), Toast.LENGTH_SHORT).show();
+        	hideProgress();
+        	return;
+        }
 
         RegisterUser.call(new RegisterUserRequest(email, displayName, password, Base64.toBase64String(publicKey.getBytes())));
     }
