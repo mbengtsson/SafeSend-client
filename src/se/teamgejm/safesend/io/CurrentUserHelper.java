@@ -29,7 +29,8 @@ public class CurrentUserHelper {
 
             CurrentUser currentUser = (CurrentUser) is.readObject();
 
-            CurrentUser.getInstance().setId(currentUser.getId());
+            CurrentUser.getInstance().setUserId(currentUser.getUserId());
+            CurrentUser.getInstance().setDisplayName(currentUser.getDisplayName());
             CurrentUser.getInstance().setEmail(currentUser.getEmail());
 
             is.close();

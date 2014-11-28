@@ -34,16 +34,14 @@
                 android:name="se.teamgejm.safesend.activities.SendMessageActivity"
                 android:label="@string/app_name">
         </activity>
-        <activity
-                android:name="se.teamgejm.safesend.activities.OpenMessageActivity"
-                android:label="@string/app_name">
-        </activity>
+
         <activity android:name=".activities.RegisterActivity"/>
         <activity android:name=".activities.ListMessagesActivity"/>
 
         <service android:name=".service.EncryptMessageIntentService"/>
         <service android:name=".service.DecryptMessageIntentService"/>
         <service android:name=".service.GenerateKeysIntentService"/>
+        <service android:name=".service.FetchMessagesIntentService"/>
 
     </application>
 

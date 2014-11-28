@@ -29,7 +29,16 @@ public class CurrentUser extends User {
         return password;
     }
 
+
     public void setPassword (String password) {
         this.password = password;
+    }
+
+
+    @Override
+    public String toString () {
+        return super.toString() + "CurrentUser{" +
+                "password='" + password + '\'' +
+                '}';
     }
 }

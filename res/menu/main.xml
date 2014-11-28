@@ -8,4 +8,10 @@
             android:icon="@android:drawable/ic_menu_add"
             android:title="@string/action_send_new_message"/>
 
+    <item
+            android:id="@+id/action_update_messages"
+            android:showAsAction="always"
+            android:icon="@android:drawable/ic_menu_rotate"
+            android:title="@string/action_update_messages"/>
+
 </menu>

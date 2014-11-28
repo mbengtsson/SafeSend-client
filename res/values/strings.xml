@@ -45,5 +45,7 @@
 
     <string name="action_send_new_message">Send new message</string>
     <string name="action_send_message">Send</string>
+    <string name="action_update_messages">Update</string>
+
 
 </resources>

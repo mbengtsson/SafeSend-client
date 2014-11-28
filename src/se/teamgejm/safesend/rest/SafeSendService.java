@@ -37,7 +37,13 @@ public interface SafeSendService {
     @GET("/api/messages")
     public void getMessages (Callback<List<Message>> cb);
 
+    @GET("/api/messages")
+    public List<Message> getMessagesSynchronously ();
+
     @GET("/api/messages/{id}")
     public void getMessageById (@Path("id") long id, Callback<Message> cb);
+
+    @GET("/api/messages/{id}")
+    public Message getMessageByIdSynchronously (@Path("id") long id);
 
 }
