@@ -6,12 +6,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.entities.CurrentUser;
 import se.teamgejm.safesend.entities.Message;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Gustav
@@ -30,8 +34,13 @@ public class MessageAdapter extends BaseAdapter {
      */
     static class MessageHolder {
 
-        TextView messageText;
-        TextView messageDate;
+        TextView messageTextReceiver;
+        TextView messageDateReceiver;
+        TextView messageTextSender;
+        TextView messageDateSender;
+
+        RelativeLayout senderContainer;
+        RelativeLayout receiverContainer;
     }
 
     public MessageAdapter (Activity context) {
@@ -95,17 +104,16 @@ public class MessageAdapter extends BaseAdapter {
         if (convertView == null) {
             final LayoutInflater inflater = mContext.getLayoutInflater();
 
-            if (message.getSender().getUserId() == CurrentUser.getInstance().getUserId()) {
-                convertView = inflater.inflate(R.layout.message_list_item_sent, parent, false);
-            }
-            else {
-                convertView = inflater.inflate(R.layout.message_list_item_received, parent, false);
-            }
-
+            convertView = inflater.inflate(R.layout.message_list_item, parent, false);
 
             holder = new MessageHolder();
-            holder.messageText = (TextView) convertView.findViewById(R.id.message_item_text);
-            holder.messageDate = (TextView) convertView.findViewById(R.id.message_item_date);
+            holder.messageTextReceiver = (TextView) convertView.findViewById(R.id.message_item_text_receiver);
+            holder.messageDateReceiver = (TextView) convertView.findViewById(R.id.message_item_date_receiver);
+            holder.messageTextSender = (TextView) convertView.findViewById(R.id.message_item_text_sender);
+            holder.messageDateSender = (TextView) convertView.findViewById(R.id.message_item_date_sender);
+
+            holder.senderContainer = (RelativeLayout) convertView.findViewById(R.id.senderContainer);
+            holder.receiverContainer = (RelativeLayout) convertView.findViewById(R.id.receiverContainer);
 
             convertView.setTag(holder);
         }
@@ -113,12 +121,18 @@ public class MessageAdapter extends BaseAdapter {
             holder = (MessageHolder) convertView.getTag();
         }
 
-        Date date = new Date(message.getTimeStamp());
-
-        //holder.username.setText(message.getSender().getDisplayName());
-
-        holder.messageDate.setText(this.getDate(message.getTimeStamp()));
-        holder.messageText.setText(message.getMessage());
+        if (message.getSender().getUserId() == CurrentUser.getInstance().getUserId()) {
+            holder.messageDateReceiver.setText(this.getDate(message.getTimeStamp()));
+            holder.messageTextReceiver.setText(message.getMessage());
+            holder.senderContainer.setVisibility(View.GONE);
+            holder.receiverContainer.setVisibility(View.VISIBLE);
+        }
+        else {
+            holder.messageDateSender.setText(this.getDate(message.getTimeStamp()));
+            holder.messageTextSender.setText(message.getMessage());
+            holder.receiverContainer.setVisibility(View.GONE);
+            holder.senderContainer.setVisibility(View.VISIBLE);
+        }
 
         return convertView;
     }
