@@ -1,5 +1,6 @@
 package se.teamgejm.safesend.activities;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -44,6 +45,11 @@ public class ListMessagesActivity extends Activity {
         }
 
         user = (User) getIntent().getSerializableExtra(INTENT_RECEIVER);
+        
+        final ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(getString(R.string.title_you_and) + " " + user.getDisplayName());
+        }
 
         messageListProgressBar = (ProgressBar) findViewById(R.id.message_list_progress_bar);
 
