@@ -1,5 +1,12 @@
 package se.teamgejm.safesend.activities;
 
+import se.teamgejm.safesend.R;
+import se.teamgejm.safesend.adapters.MessageAdapter;
+import se.teamgejm.safesend.database.dao.DbMessageDao;
+import se.teamgejm.safesend.entities.Message;
+import se.teamgejm.safesend.entities.User;
+import se.teamgejm.safesend.events.MessageFetchingDoneEvent;
+import se.teamgejm.safesend.service.FetchMessagesIntentService;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
@@ -10,13 +17,6 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import de.greenrobot.event.EventBus;
-import se.teamgejm.safesend.R;
-import se.teamgejm.safesend.adapters.MessageAdapter;
-import se.teamgejm.safesend.database.dao.DbMessageDao;
-import se.teamgejm.safesend.entities.Message;
-import se.teamgejm.safesend.entities.User;
-import se.teamgejm.safesend.events.MessageFetchingDoneEvent;
-import se.teamgejm.safesend.service.FetchMessagesIntentService;
 
 /**
  * @author Emil Stjerneman
@@ -114,6 +114,9 @@ public class ListMessagesActivity extends Activity {
 
     private void startLoading () {
         messageListProgressBar.setVisibility(View.VISIBLE);
+        Intent intent = new Intent(this, FetchMessagesIntentService.class);
+        intent.putExtra(FetchMessagesIntentService.INTENT_SENDER_DISPLAYNAME, user.getDisplayName());
+        startService(intent);
     }
 
     private void stopLoading () {

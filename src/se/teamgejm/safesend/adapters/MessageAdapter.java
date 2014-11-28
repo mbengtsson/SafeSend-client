@@ -126,12 +126,14 @@ public class MessageAdapter extends BaseAdapter {
             holder.messageTextReceiver.setText(message.getMessage());
             holder.senderContainer.setVisibility(View.GONE);
             holder.receiverContainer.setVisibility(View.VISIBLE);
+            convertView.setBackgroundResource(R.color.skin);
         }
         else {
             holder.messageDateSender.setText(this.getDate(message.getTimeStamp()));
             holder.messageTextSender.setText(message.getMessage());
             holder.receiverContainer.setVisibility(View.GONE);
             holder.senderContainer.setVisibility(View.VISIBLE);
+            convertView.setBackgroundResource(R.color.green);
         }
 
         return convertView;

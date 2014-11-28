@@ -1,23 +1,24 @@
 package se.teamgejm.safesend.activities;
 
+import java.security.Security;
+
+import se.teamgejm.safesend.R;
+import se.teamgejm.safesend.adapters.UserAdapter;
+import se.teamgejm.safesend.database.dao.DbUserDao;
+import se.teamgejm.safesend.entities.User;
+import se.teamgejm.safesend.events.CheckNewMessagesDoneEvent;
+import se.teamgejm.safesend.service.CheckNewMessagesIntentService;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import de.greenrobot.event.EventBus;
-import se.teamgejm.safesend.R;
-import se.teamgejm.safesend.adapters.UserAdapter;
-import se.teamgejm.safesend.database.dao.DbUserDao;
-import se.teamgejm.safesend.entities.User;
-import se.teamgejm.safesend.events.MessageFetchingDoneEvent;
-import se.teamgejm.safesend.service.FetchMessagesIntentService;
-
-import java.security.Security;
 
 /**
  * @author Gustav
@@ -78,17 +79,12 @@ public class MainActivity extends Activity {
     protected void onResume () {
         super.onResume();
 
-        Intent intent = new Intent(this, FetchMessagesIntentService.class);
-        startService(intent);
         startLoading();
-
     }
 
     @Override
     protected void onPause () {
         super.onPause();
-
-        dbUserDao.close();
     }
 
     @Override
@@ -108,24 +104,20 @@ public class MainActivity extends Activity {
                 return true;
 
             case R.id.action_update_messages:
-                startService(new Intent(this, FetchMessagesIntentService.class));
-                startLoading();
+            	startLoading();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
-
-    public void onEvent (MessageFetchingDoneEvent event) {
-        stopLoading();
+    
+    private void startLoading() {
+    	Log.d(TAG, "Checking for new messages");
+        startService(new Intent(this, CheckNewMessagesIntentService.class));
     }
-
-    private void startLoading () {
-
-    }
-
-    private void stopLoading () {
-        adapter.clearUsers();
+    
+    private void stopLoading() {
+    	adapter.clearUsers();
 
         dbUserDao = new DbUserDao(this);
         dbUserDao.open();
@@ -135,7 +127,15 @@ public class MainActivity extends Activity {
         for (final User user : dbUserDao.getUsersWithMessages()) {
             adapter.addUser(user);
         }
+        
+        dbUserDao.close();
 
         adapter.notifyDataSetChanged();
+    }
+    
+    public void onEvent(CheckNewMessagesDoneEvent event) {
+    	Log.d(TAG, "Checking for new messages - done");
+    	adapter.setNewMessageHolder(event.getNewMessagesHolder());
+    	stopLoading();
     }
 }

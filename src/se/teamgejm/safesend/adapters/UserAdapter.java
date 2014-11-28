@@ -1,22 +1,27 @@
 package se.teamgejm.safesend.adapters;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import se.teamgejm.safesend.R;
+import se.teamgejm.safesend.entities.User;
 import android.app.Activity;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import se.teamgejm.safesend.R;
-import se.teamgejm.safesend.entities.User;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Emil Stjerneman
  */
 public class UserAdapter extends BaseAdapter {
+	
+	private Map<String, Integer> newMessagesByName = new HashMap<String, Integer>();
 
     private Activity mContext;
 
@@ -90,7 +95,16 @@ public class UserAdapter extends BaseAdapter {
         }
 
         final User user = mItems.get(position);
-        holder.username.setText(user.getDisplayName());
+        
+        if (newMessagesByName.containsKey(user.getDisplayName())) {
+        	holder.username.setTypeface(Typeface.DEFAULT_BOLD);
+        	holder.username.setText(user.getDisplayName() + " (" + newMessagesByName.get(user.getDisplayName()) + ")");
+        	convertView.setBackgroundResource(R.color.green);
+        } else {
+        	holder.username.setTypeface(Typeface.DEFAULT);
+            holder.username.setText(user.getDisplayName());
+        	convertView.setBackgroundResource(R.color.lightgreen);
+        }
 
         return convertView;
     }
@@ -109,6 +123,9 @@ public class UserAdapter extends BaseAdapter {
     public long getItemId (int position) {
         return position;
     }
-
+    
+    public void setNewMessageHolder(Map<String, Integer> newMessagesHolder) {
+    	this.newMessagesByName = newMessagesHolder;
+    }
 
 }

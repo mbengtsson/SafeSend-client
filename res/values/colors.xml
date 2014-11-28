@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="icon">#cccccc</color>
+    <color name="skin">#FFFFFF</color>
+    <color name="green">#C8E876</color>
+    <color name="lightgreen">#F2F5BC</color>
 </resources>

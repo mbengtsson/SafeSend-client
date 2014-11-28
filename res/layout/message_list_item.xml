@@ -10,12 +10,14 @@
             android:layout_height="fill_parent"
             android:layout_alignParentEnd="false"
             android:id="@+id/receiverContainer">
+
         <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/darker_gray"
-                android:padding="8dp" android:id="@+id/frameLayout_receiver"
-                android:layout_alignParentRight="true">
+            android:id="@+id/frameLayout_receiver"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:padding="8dp" >
+
             <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -49,10 +51,11 @@
             android:id="@+id/senderContainer">
 
         <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/darker_gray"
-                android:padding="8dp" android:id="@+id/frameLayout_sender">
+            android:id="@+id/frameLayout_sender"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp" >
+
             <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

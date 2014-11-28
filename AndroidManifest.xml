@@ -38,6 +38,7 @@
         <service android:name=".service.DecryptMessageIntentService"/>
         <service android:name=".service.GenerateKeysIntentService"/>
         <service android:name=".service.FetchMessagesIntentService"/>
+        <service android:name=".service.CheckNewMessagesIntentService"/>
 
     </application>
 
