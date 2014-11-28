@@ -37,7 +37,9 @@ public class MainActivity extends Activity {
         Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
 
         final ActionBar actionBar = getActionBar();
-        actionBar.setDisplayShowTitleEnabled(false);
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(false);
+        }
 
         userListView = (ListView) findViewById(R.id.userListView);
         adapter = new UserAdapter(this);

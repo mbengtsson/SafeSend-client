@@ -1,7 +1,6 @@
 package se.teamgejm.safesend.adapters;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -108,10 +107,6 @@ public class MessageAdapter extends BaseAdapter {
         }
 
         final Message message = this.getMessage(position);
-
-        Log.d("List size", "" + mItems.size());
-        Log.d("List pos", "" + position);
-        Log.d("Message on " + position + ":", message.toString());
 
         Date date = new Date(message.getTimeStamp());
 

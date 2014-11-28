@@ -111,6 +111,8 @@ public class SendMessageActivity extends Activity {
 
         if (getIntent().hasExtra(INTENT_RECEIVER)) {
             setReceiver((User) getIntent().getSerializableExtra(INTENT_RECEIVER));
+            userSprinner.setVisibility(View.GONE);
+            hideProgress();
         }
         else {
             FetchUserList.call();
@@ -202,6 +204,10 @@ public class SendMessageActivity extends Activity {
 
         dbMessageDao.addMessage(new Message(CurrentUser.getInstance(), receiver, stringToSend));
 
+        Intent intent = new Intent(this, ListMessagesActivity.class);
+        intent.putExtra(ListMessagesActivity.INTENT_RECEIVER, getReceiver());
+        startActivity(intent);
+
         hideProgress();
     }
 
@@ -256,13 +262,12 @@ public class SendMessageActivity extends Activity {
      */
     public class EncryptMessageResponseReceiver extends BroadcastReceiver {
 
-        public static final String ACTION_RESP = "se.teamgejm.intent.action.MESSAGE_PROCESSED";
+        public static final String ACTION_RESP = "se.teamgejm.intent.action.MESSAGE_ENCRYPT";
 
         @Override
         public void onReceive (Context context, Intent intent) {
 
             String encryptedMessage = intent.getStringExtra(EncryptMessageIntentService.MESSAGE_OUT);
-            Log.d(TAG, "Encrypted message:" + encryptedMessage);
 
             if (encryptedMessage == null) {
                 Toast.makeText(getApplicationContext(), getString(R.string.failed_encryption), Toast.LENGTH_SHORT).show();

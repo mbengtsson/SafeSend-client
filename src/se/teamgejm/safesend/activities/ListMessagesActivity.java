@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -66,12 +68,6 @@ public class ListMessagesActivity extends Activity {
         dbMessageDao = new DbMessageDao(this);
         dbMessageDao.open();
 
-        for (Message message : dbMessageDao.getAllMessage(user.getUserId())) {
-            adapter.addMessage(message);
-        }
-
-        adapter.notifyDataSetChanged();
-
         startLoading();
     }
 
@@ -91,6 +87,27 @@ public class ListMessagesActivity extends Activity {
     protected void onDestroy () {
         unregisterReceiver(decryptMessageResponseReceiver);
         super.onDestroy();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu (Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected (MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.action_send_new_message:
+                Intent intent = new Intent(this, SendMessageActivity.class);
+                intent.putExtra(SendMessageActivity.INTENT_RECEIVER, user);
+                startActivity(intent);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void onEvent (MessageListFailedEvent event) {
@@ -124,6 +141,14 @@ public class ListMessagesActivity extends Activity {
 
     private void stopLoading () {
         messageListProgressBar.setVisibility(View.GONE);
+
+        adapter.clearMessages();
+
+        for (Message message : dbMessageDao.getAllMessage(user.getUserId())) {
+            adapter.addMessage(message);
+        }
+
+        adapter.notifyDataSetChanged();
     }
 
     private void registerResponseReciever () {
@@ -146,13 +171,11 @@ public class ListMessagesActivity extends Activity {
      */
     public class DecryptMessageResponseReceiver extends BroadcastReceiver {
 
-        public static final String ACTION_RESP = "se.teamgejm.intent.action.MESSAGE_PROCESSED";
+        public static final String ACTION_RESP = "se.teamgejm.intent.action.MESSAGE_DECRYPT";
 
         @Override
         public void onReceive (Context context, Intent intent) {
-
             final Message message = (Message) intent.getSerializableExtra(DecryptMessageIntentService.MESSAGE_OUT);
-            Log.d(TAG, "Decrypted message:" + message.toString());
 
             if (message == null) {
                 Toast.makeText(getApplicationContext(), getString(R.string.failed_decryption), Toast.LENGTH_SHORT).show();
@@ -160,6 +183,7 @@ public class ListMessagesActivity extends Activity {
                 return;
             }
 
+            Log.d(TAG, "Decrypted message:" + message.toString());
             dbMessageDao.addMessage(message);
 
             stopLoading();
