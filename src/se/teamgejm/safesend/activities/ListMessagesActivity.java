@@ -76,6 +76,12 @@ public class ListMessagesActivity extends Activity {
     }
 
     @Override
+	protected void onResume() {
+    	startLoading();
+		super.onResume();
+	}
+
+	@Override
     protected void onDestroy () {
         dbMessageDao.close();
         super.onDestroy();
