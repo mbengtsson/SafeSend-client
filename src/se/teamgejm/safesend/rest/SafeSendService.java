@@ -10,7 +10,6 @@ import se.teamgejm.safesend.entities.User;
 import se.teamgejm.safesend.entities.request.RegisterUserRequest;
 import se.teamgejm.safesend.entities.request.SendMessageRequest;
 import se.teamgejm.safesend.entities.request.ValidateCredentialsRequest;
-import se.teamgejm.safesend.entities.response.MessageResponse;
 import se.teamgejm.safesend.entities.response.UserResponse;
 
 import java.util.List;
@@ -34,11 +33,11 @@ public interface SafeSendService {
 
     @POST("/api/messages")
     public void sendMessage (@Body SendMessageRequest message, Callback<String> cb);
-    
+
     @GET("/api/messages")
     public void getMessages (Callback<List<Message>> cb);
-    
+
     @GET("/api/messages/{id}")
-    public void getMessageById (@Path("id") long id, Callback<MessageResponse> cb);
+    public void getMessageById (@Path("id") long id, Callback<Message> cb);
 
 }

@@ -1,7 +1,6 @@
 package se.teamgejm.safesend.adapters;
 
 import android.app.Activity;
-import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +36,7 @@ public class UserAdapter extends BaseAdapter {
     public UserAdapter (Activity context) {
         super();
         mContext = context;
-        mItems = new ArrayList<User>();
+        mItems = new ArrayList<>();
     }
 
     /**
@@ -91,11 +90,6 @@ public class UserAdapter extends BaseAdapter {
         }
 
         final User user = mItems.get(position);
-
-        final Typeface font = Typeface.createFromAsset(mContext.getAssets(), "fontawesome-webfont.ttf");
-        final TextView icon = (TextView) convertView.findViewById(R.id.user_item_icon);
-        icon.setTypeface(font);
-
         holder.username.setText(user.getDisplayName());
 
         return convertView;

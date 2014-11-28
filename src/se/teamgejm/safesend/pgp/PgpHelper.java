@@ -1,33 +1,25 @@
 package se.teamgejm.safesend.pgp;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-
+import android.content.Context;
+import android.util.Log;
 import org.spongycastle.openpgp.PGPException;
 import org.spongycastle.openpgp.PGPPublicKeyRing;
 import org.spongycastle.openpgp.PGPSecretKeyRing;
 import org.spongycastle.openpgp.PGPUtil;
 import org.spongycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
+import se.teamgejm.safesend.entities.CurrentUser;
 
-import se.teamgejm.safesend.entities.UserCredentials;
-import android.content.Context;
-import android.util.Log;
+import java.io.*;
+import java.nio.charset.Charset;
 
 /**
  * Helper class for all PGP purposes within the application. Easy-to-use methods.
- * 
- * @author Gustav
  *
+ * @author Gustav
  */
 public class PgpHelper {
 
-	// File names of messages in different encryption states.
+    // File names of messages in different encryption states.
     public static final String MESSAGE_PLAINTEXT = "message.txt";
     public static final String MESSAGE_SIGNED = "signed.asc";
     public static final String MESSAGE_ENCRYPTED = "message.asc";
@@ -43,16 +35,19 @@ public class PgpHelper {
 
     /**
      * Generates a private and public key with the users credentials.
-     * 
-     * @param context Application context need to open FileInput/OutputStreams.
-     * @param identity The users email.
-     * @param password The users password.
-     * 
+     *
+     * @param context
+     *         Application context need to open FileInput/OutputStreams.
+     * @param identity
+     *         The users email.
+     * @param password
+     *         The users password.
+     *
      * @return The public key, null if an error occurred.
      */
     public static String generateKeyPair (Context context, String identity, String password) {
         PgpHelper.context = context;
-        
+
         String publicKey = null;
 
         try {
@@ -62,25 +57,27 @@ public class PgpHelper {
             publicKey = PgpKeyPairGenerator.exportKeyPair(privKey, pubKey, identity, password.toCharArray(), true);
         }
         catch (Exception e) {
-        	Log.e(TAG, e.getMessage());
+            Log.e(TAG, e.getMessage());
         }
-        
+
         return publicKey;
     }
 
     /**
      * Signs a file with the senders private key and encrypts it with the receivers public key.
-     * 
-     * @param context Application context need to open FileInput/OutputStreams.
-     * @param publicKeyIn The receivers public key,
-     * 
+     *
+     * @param context
+     *         Application context need to open FileInput/OutputStreams.
+     * @param publicKeyIn
+     *         The receivers public key,
+     *
      * @return The encrypted message, null if an error occurred.
      */
     public static String signAndEncrypt (Context context, InputStream publicKeyIn, String message) {
         PgpHelper.context = context;
 
         String encryptedMessage = null;
-        
+
         PgpHelper.createFile(PgpHelper.getContext(), message.getBytes(), PgpHelper.MESSAGE_PLAINTEXT);
 
         try {
@@ -91,7 +88,7 @@ public class PgpHelper {
 
             FileOutputStream signedMessageStream = PgpHelper.getContext().openFileOutput(MESSAGE_SIGNED, Context.MODE_PRIVATE);
             InputStream privKey = PgpHelper.getContext().openFileInput(KEY_PRIVATE);
-            PgpSignedFileProcessor.signFile(msg, privKey, signedMessageStream, UserCredentials.getInstance().getPassword().toCharArray(), false);
+            PgpSignedFileProcessor.signFile(msg, privKey, signedMessageStream, CurrentUser.getInstance().getPassword().toCharArray(), false);
 
             Log.d(TAG, "Message signed!");
             Log.d(TAG, "SIGNING PROCESS COMPLETE");
@@ -110,7 +107,7 @@ public class PgpHelper {
         catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
-        
+
         // Delete the files generated after encryption
         PgpHelper.getContext().deleteFile(MESSAGE_PLAINTEXT);
         PgpHelper.getContext().deleteFile(MESSAGE_SIGNED);
@@ -121,23 +118,25 @@ public class PgpHelper {
 
     /**
      * Decrypts a file with the receivers private key and verifies the senders identity using his/her public key.
-     * 
-     * @param context Application context need to open FileInput/OutputStreams.
-     * @param publicKeyIn The senders public key.
-     * 
+     *
+     * @param context
+     *         Application context need to open FileInput/OutputStreams.
+     * @param publicKeyIn
+     *         The senders public key.
+     *
      * @return The decrypted message, null if an error occurred.
      */
     public static String decryptAndVerify (Context context, InputStream publicKeyIn, byte[] encryptedMessage) {
         PgpHelper.context = context;
 
         String message = null;
-        
+
         PgpHelper.createFile(PgpHelper.getContext(), encryptedMessage, PgpHelper.MESSAGE_ENCRYPTED);
 
         try {
             Log.d(TAG, "STARTING DECRYPTION PROCESS");
 
-            PgpFileProcessor.decryptFile(MESSAGE_ENCRYPTED, KEY_PRIVATE, UserCredentials.getInstance().getPassword().toCharArray(), MESSAGE_DEFAULT_NAME);
+            PgpFileProcessor.decryptFile(MESSAGE_ENCRYPTED, KEY_PRIVATE, CurrentUser.getInstance().getPassword().toCharArray(), MESSAGE_DEFAULT_NAME);
 
             Log.d(TAG, "DECRYPTION PROCESS COMPLETE");
 
@@ -148,7 +147,7 @@ public class PgpHelper {
                     new JcaKeyFingerprintCalculator());
             PGPPublicKeyRing pubRing = new PGPPublicKeyRing(PGPUtil.getDecoderStream(publicKeyIn),
                     new JcaKeyFingerprintCalculator());
-            PGPPublicKeyRing signedRing = new PGPPublicKeyRing(new ByteArrayInputStream(PgpSignedFileProcessor.signPublicKey(secRing.getSecretKey(), UserCredentials.getInstance().getPassword(), pubRing.getPublicKey(), "Auto-signed", "Safe-Send")), new JcaKeyFingerprintCalculator());
+            PGPPublicKeyRing signedRing = new PGPPublicKeyRing(new ByteArrayInputStream(PgpSignedFileProcessor.signPublicKey(secRing.getSecretKey(), CurrentUser.getInstance().getPassword(), pubRing.getPublicKey(), "Auto-signed", "Safe-Send")), new JcaKeyFingerprintCalculator());
 
             Log.d(TAG, "Senders public key signed!");
 
@@ -173,7 +172,7 @@ public class PgpHelper {
         catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
-        
+
         // Delete the files generated after decryption
         PgpHelper.getContext().deleteFile(MESSAGE_ENCRYPTED);
         PgpHelper.getContext().deleteFile(MESSAGE_SIGNED);
@@ -184,10 +183,13 @@ public class PgpHelper {
 
     /**
      * Creates a file of a byte array.
-     * 
-     * @param context Application context need to open FileInput/OutputStreams.
-     * @param content The byte array to persist.
-     * @param fileName The file name.
+     *
+     * @param context
+     *         Application context need to open FileInput/OutputStreams.
+     * @param content
+     *         The byte array to persist.
+     * @param fileName
+     *         The file name.
      */
     public static void createFile (Context context, byte[] content, String fileName) {
         PgpHelper.context = context;
@@ -206,34 +208,38 @@ public class PgpHelper {
 
     /**
      * Creates a String of a file.
-     * 
-     * @param fileName The name of the file.
-     * @param context Application context need to open FileInput/OutputStreams.
-     * 
+     *
+     * @param fileName
+     *         The name of the file.
+     * @param context
+     *         Application context need to open FileInput/OutputStreams.
+     *
      * @return The String representation of the file.
      */
     public static String fileToString (String fileName, Context context) {
         File file = new File(context.getFilesDir(), fileName);
         byte[] b = null;
-		try {
-	        InputStream in = context.openFileInput(fileName);
-	        b = new byte[(int) file.length()];
-	        int len = b.length;
-	        int total = 0;
+        try {
+            InputStream in = context.openFileInput(fileName);
+            b = new byte[(int) file.length()];
+            int len = b.length;
+            int total = 0;
 
-	        while (total < len) {
-	            int result = in.read(b, total, len - total);
-	            if (result == -1) {
-	                break;
-	            }
-	            total += result;
-	        }
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+            while (total < len) {
+                int result = in.read(b, total, len - total);
+                if (result == -1) {
+                    break;
+                }
+                total += result;
+            }
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return new String(b, Charset.defaultCharset());
     }
 

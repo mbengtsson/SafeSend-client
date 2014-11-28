@@ -1,93 +1,104 @@
 package se.teamgejm.safesend.activities;
 
+import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v13.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import se.teamgejm.safesend.R;
-import se.teamgejm.safesend.fragments.MessageListFragment;
-import se.teamgejm.safesend.fragments.UserListFragment;
+import se.teamgejm.safesend.adapters.UserAdapter;
+import se.teamgejm.safesend.database.dao.DbUserDao;
+import se.teamgejm.safesend.entities.User;
 
 import java.security.Security;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * 
  * @author Gustav
- *
  */
 public class MainActivity extends Activity {
 
-    private ViewPager viewPager;
-    private FragmentPagerAdapter pagerAdapter;
+    private final static String TAG = "MainActivity";
+
+    private DbUserDao dbUserDao;
+
+    private ListView userListView;
+
+    private UserAdapter adapter;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
 
-        setPagerAdapter(new MyPagerAdapter(this.getFragmentManager(), getFragments()));
-        setViewPager((ViewPager) findViewById(R.id.main_viewpager_layout));
-        getViewPager().setAdapter(getPagerAdapter());
-    }
-
-    private List<Fragment> getFragments () {
-        List<Fragment> fragments = new ArrayList<Fragment>();
-        fragments.add(new UserListFragment());
-        fragments.add(new MessageListFragment());
-        return fragments;
-    }
-
-    public ViewPager getViewPager () {
-        return viewPager;
-    }
-
-    public void setViewPager (ViewPager viewPager) {
-        this.viewPager = viewPager;
-    }
-
-    public FragmentPagerAdapter getPagerAdapter () {
-        return pagerAdapter;
-    }
-
-    public void setPagerAdapter (FragmentPagerAdapter pagerAdapter) {
-        this.pagerAdapter = pagerAdapter;
-    }
-
-    private class MyPagerAdapter extends FragmentPagerAdapter {
-
-        List<Fragment> fragments;
-
-        public MyPagerAdapter (FragmentManager fm, List<Fragment> fragments) {
-            super(fm);
-            this.fragments = fragments;
+        final ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(false);
         }
 
-        @Override
-        public Fragment getItem (int position) {
-            return fragments.get(position);
-        }
+        userListView = (ListView) findViewById(R.id.userListView);
+        adapter = new UserAdapter(this);
+        userListView.setAdapter(adapter);
 
-        @Override
-        public int getCount () {
-            return fragments.size();
-        }
+        userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-        @Override
-        public CharSequence getPageTitle (int position) {
-            switch (position) {
-                case 0:
-                    return "SafeSend";
-                case 1:
-                    return "Inbox";
-                default:
-                    return null;
+            @Override
+            public void onItemClick (AdapterView<?> parent, View view, int pos, long id) {
+                final User user = adapter.getUser(pos);
+
+                final Intent intent = new Intent(getApplicationContext(), ListMessagesActivity.class);
+                intent.putExtra(ListMessagesActivity.INTENT_RECEIVER, user);
+                startActivity(intent);
             }
+        });
+    }
+
+    @Override
+    protected void onResume () {
+        super.onResume();
+
+        dbUserDao = new DbUserDao(this);
+        dbUserDao.open();
+
+        adapter.clearUsers();
+
+        for (final User user : dbUserDao.getUsersWithMessages()) {
+            adapter.addUser(user);
         }
+
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onPause () {
+        super.onPause();
+
+        dbUserDao.close();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu (Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected (MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.action_send_new_message:
+                Intent intent = new Intent(this, SendMessageActivity.class);
+                startActivity(intent);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 }
