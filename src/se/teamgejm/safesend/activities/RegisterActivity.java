@@ -44,6 +44,8 @@ public class RegisterActivity extends Activity {
     		"^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
     		+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
     
+    private static final String DISPLAYNAME_PATTERN = "^[A-Za-z0-9]+(?:[ ][A-Za-z0-9]+)*$";
+    
     private GenerateKeysResponseReciever genKeysReceiver;
 
     @Override
@@ -143,14 +145,21 @@ public class RegisterActivity extends Activity {
         final String email = ((TextView) findViewById(R.id.register_email)).getText().toString();
         final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
         
-        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-        Matcher matcher = pattern.matcher(email);
+        Pattern emailPattern = Pattern.compile(EMAIL_PATTERN);
+        Matcher emailMatcher = emailPattern.matcher(email);
         
-        if (displayName == null || displayName.length() < 4) {
+        Pattern displayNamePattern = Pattern.compile(DISPLAYNAME_PATTERN);
+        Matcher displayNameMatcher = displayNamePattern.matcher(displayName);
+        
+        if (displayName == null || displayName.length() < 4 || displayName.length() > 14) {
         	Toast.makeText(getApplicationContext(), getString(R.string.register_fail_displayname), Toast.LENGTH_SHORT).show();
         	hideProgress();
         	return;
-        } else if (email == null || !matcher.matches()) {
+        } else if (!displayNameMatcher.matches()) {
+        	Toast.makeText(getApplicationContext(), getString(R.string.register_fail_displayname_char), Toast.LENGTH_SHORT).show();
+        	hideProgress();
+        	return;
+        } else if (email == null || !emailMatcher.matches()) {
         	Toast.makeText(getApplicationContext(), getString(R.string.register_fail_email), Toast.LENGTH_SHORT).show();
         	hideProgress();
         	return;

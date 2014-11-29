@@ -1,11 +1,12 @@
 package se.teamgejm.safesend.service;
 
-import android.app.IntentService;
-import android.content.Intent;
-import android.util.Log;
-import de.greenrobot.event.EventBus;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.List;
+
 import org.spongycastle.openpgp.PGPException;
 import org.spongycastle.util.encoders.Base64;
+
 import se.teamgejm.safesend.database.dao.DbMessageDao;
 import se.teamgejm.safesend.database.dao.DbUserDao;
 import se.teamgejm.safesend.entities.Message;
@@ -13,12 +14,16 @@ import se.teamgejm.safesend.events.MessageFetchingDoneEvent;
 import se.teamgejm.safesend.pgp.PgpHelper;
 import se.teamgejm.safesend.rest.FetchMessageById;
 import se.teamgejm.safesend.rest.FetchMessageList;
+import android.app.IntentService;
+import android.content.Intent;
+import android.util.Log;
+import de.greenrobot.event.EventBus;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.List;
-
-
+/**
+ * 
+ * @author Gustav
+ *
+ */
 public class FetchMessagesIntentService extends IntentService {
 
     private static final String TAG = "FetchMessagesIntentService";

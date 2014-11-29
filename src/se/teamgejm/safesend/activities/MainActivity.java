@@ -1,6 +1,7 @@
 package se.teamgejm.safesend.activities;
 
 import java.security.Security;
+import java.util.Map;
 
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.adapters.UserAdapter;
@@ -75,15 +76,15 @@ public class MainActivity extends Activity {
         super.onStop();
     }
 
-
     @Override
-    protected void onResume () {
-        super.onResume();
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		if (hasFocus) {
+	        startLoading();
+		}
+	}
 
-        startLoading();
-    }
-
-    @Override
+	@Override
     protected void onPause () {
         super.onPause();
     }
@@ -117,29 +118,29 @@ public class MainActivity extends Activity {
         startService(new Intent(this, CheckNewMessagesIntentService.class));
     }
     
-    private void stopLoading() {
+    private void stopLoading(Map<Long, Integer> newMessages) {
+    	adapter.setNewMessagesByUserId(newMessages);
+
     	adapter.clearUsers();
-
-        dbUserDao = new DbUserDao(this);
+    	
+    	dbUserDao = new DbUserDao(this);
         dbUserDao.open();
-
-        adapter.clearUsers();
-
+    	
         for (final User user : dbUserDao.getUsersWithMessages()) {
             adapter.addUser(user);
         }
         
-        dbUserDao.close();
+    	for (Long userId : newMessages.keySet()) {
+            adapter.addUser(dbUserDao.getUser(userId));
+        }
+    	
+    	dbUserDao.close();
 
         adapter.notifyDataSetChanged();
     }
     
     public void onEvent(CheckNewMessagesDoneEvent event) {
     	Log.d(TAG, "Checking for new messages - done");
-    	for (Long userId : event.getNewMessagesByUserId().keySet()) {
-        	adapter.addUser(dbUserDao.getUser(userId));
-        }
-    	adapter.setNewMessageHolder(event.getNewMessagesByUserId());
-    	stopLoading();
+    	stopLoading(event.getNewMessagesByUserId());
     }
 }

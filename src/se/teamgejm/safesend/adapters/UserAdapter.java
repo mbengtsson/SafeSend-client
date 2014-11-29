@@ -98,9 +98,9 @@ public class UserAdapter extends BaseAdapter {
 
         final User user = mItems.get(position);
         
-        if (newMessagesByUserId.containsKey(user.getId())) {
+    	if (newMessagesByUserId.containsKey(user.getUserId())) {
         	holder.username.setTypeface(Typeface.DEFAULT_BOLD);
-        	holder.username.setText(user.getDisplayName() + " (" + newMessagesByUserId.get(user.getId()) + ")");
+        	holder.username.setText(user.getDisplayName() + " (" + newMessagesByUserId.get(user.getUserId()) + ")");
         	convertView.setBackgroundResource(R.color.green);
         } else {
         	holder.username.setTypeface(Typeface.DEFAULT);
@@ -126,8 +126,8 @@ public class UserAdapter extends BaseAdapter {
         return position;
     }
     
-    public void setNewMessageHolder(Map<Long, Integer> newMessagesHolder) {
-    	this.newMessagesByUserId = newMessagesHolder;
+    public void setNewMessagesByUserId(Map<Long, Integer> newMessagesByUserId) {
+    	this.newMessagesByUserId = newMessagesByUserId;
     }
 
 }

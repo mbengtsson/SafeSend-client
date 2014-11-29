@@ -14,6 +14,11 @@ import android.app.IntentService;
 import android.content.Intent;
 import de.greenrobot.event.EventBus;
 
+/**
+ * 
+ * @author Gustav
+ *
+ */
 @SuppressLint("UseSparseArrays")
 public class CheckNewMessagesIntentService extends IntentService {
 	
@@ -21,7 +26,7 @@ public class CheckNewMessagesIntentService extends IntentService {
 	
     private DbUserDao dbUserDao;
     
-    private Map<Long, Integer> newMessagesByName;
+    private Map<Long, Integer> newMessagesByUserId;
 
 	public CheckNewMessagesIntentService() {
 		super(TAG);
@@ -33,21 +38,20 @@ public class CheckNewMessagesIntentService extends IntentService {
 		dbUserDao = new DbUserDao(getApplicationContext());
         dbUserDao.open();
         
-        newMessagesByName = new HashMap<Long, Integer>();
+        newMessagesByUserId = new HashMap<Long, Integer>();
         
         try {
         	final List<Message> messageList = FetchMessageList.callSynchronously();
         	
         	for (Message message : messageList) {
         		User user = dbUserDao.addUser(message.getSender());
-        		long userId = user.getId();
-        		if (newMessagesByName.containsKey(userId)) {
-        			int noOfMessages = newMessagesByName.get(userId);
-        			newMessagesByName.put(userId, noOfMessages + 1);
+        		long userId = user.getUserId();
+    			if (newMessagesByUserId.containsKey(userId)) {
+        			int noOfMessages = newMessagesByUserId.get(userId);
+        			newMessagesByUserId.put(userId, noOfMessages + 1);
         		} else {
-            		newMessagesByName.put(userId, 1);
+            		newMessagesByUserId.put(userId, 1);
         		}
-
         	}
     		
         } finally {
@@ -59,7 +63,7 @@ public class CheckNewMessagesIntentService extends IntentService {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-        EventBus.getDefault().post(new CheckNewMessagesDoneEvent(newMessagesByName));
+        EventBus.getDefault().post(new CheckNewMessagesDoneEvent(newMessagesByUserId));
 	}
 	
 }
