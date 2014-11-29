@@ -8,6 +8,7 @@ import java.util.Map;
 
 import se.teamgejm.safesend.R;
 import se.teamgejm.safesend.entities.User;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
@@ -19,9 +20,10 @@ import android.widget.TextView;
 /**
  * @author Emil Stjerneman
  */
+@SuppressLint("UseSparseArrays")
 public class UserAdapter extends BaseAdapter {
 	
-	private Map<String, Integer> newMessagesByName = new HashMap<String, Integer>();
+	private Map<Long, Integer> newMessagesByUserId = new HashMap<Long, Integer>();
 
     private Activity mContext;
 
@@ -96,9 +98,9 @@ public class UserAdapter extends BaseAdapter {
 
         final User user = mItems.get(position);
         
-        if (newMessagesByName.containsKey(user.getDisplayName())) {
+        if (newMessagesByUserId.containsKey(user.getId())) {
         	holder.username.setTypeface(Typeface.DEFAULT_BOLD);
-        	holder.username.setText(user.getDisplayName() + " (" + newMessagesByName.get(user.getDisplayName()) + ")");
+        	holder.username.setText(user.getDisplayName() + " (" + newMessagesByUserId.get(user.getId()) + ")");
         	convertView.setBackgroundResource(R.color.green);
         } else {
         	holder.username.setTypeface(Typeface.DEFAULT);
@@ -124,8 +126,8 @@ public class UserAdapter extends BaseAdapter {
         return position;
     }
     
-    public void setNewMessageHolder(Map<String, Integer> newMessagesHolder) {
-    	this.newMessagesByName = newMessagesHolder;
+    public void setNewMessageHolder(Map<Long, Integer> newMessagesHolder) {
+    	this.newMessagesByUserId = newMessagesHolder;
     }
 
 }

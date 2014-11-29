@@ -6,19 +6,22 @@ import java.util.Map;
 
 import se.teamgejm.safesend.database.dao.DbUserDao;
 import se.teamgejm.safesend.entities.Message;
+import se.teamgejm.safesend.entities.User;
 import se.teamgejm.safesend.events.CheckNewMessagesDoneEvent;
 import se.teamgejm.safesend.rest.FetchMessageList;
+import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.content.Intent;
 import de.greenrobot.event.EventBus;
 
+@SuppressLint("UseSparseArrays")
 public class CheckNewMessagesIntentService extends IntentService {
 	
 	private static final String TAG = "CheckNewMessagesIntentService";
 	
     private DbUserDao dbUserDao;
     
-    private Map<String, Integer> newMessagesByName;
+    private Map<Long, Integer> newMessagesByName;
 
 	public CheckNewMessagesIntentService() {
 		super(TAG);
@@ -30,21 +33,21 @@ public class CheckNewMessagesIntentService extends IntentService {
 		dbUserDao = new DbUserDao(getApplicationContext());
         dbUserDao.open();
         
-        newMessagesByName = new HashMap<String, Integer>();
+        newMessagesByName = new HashMap<Long, Integer>();
         
         try {
         	final List<Message> messageList = FetchMessageList.callSynchronously();
         	
         	for (Message message : messageList) {
-        		String displayName = message.getSender().getDisplayName();
-        		if (newMessagesByName.containsKey(displayName)) {
-        			int noOfMessages = newMessagesByName.get(displayName);
-        			newMessagesByName.put(displayName, noOfMessages + 1);
+        		User user = dbUserDao.addUser(message.getSender());
+        		long userId = user.getId();
+        		if (newMessagesByName.containsKey(userId)) {
+        			int noOfMessages = newMessagesByName.get(userId);
+        			newMessagesByName.put(userId, noOfMessages + 1);
         		} else {
-            		newMessagesByName.put(displayName, 1);
+            		newMessagesByName.put(userId, 1);
         		}
 
-        		dbUserDao.addUser(message.getSender());
         	}
     		
         } finally {

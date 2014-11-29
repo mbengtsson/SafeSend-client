@@ -18,8 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import de.greenrobot.event.EventBus;
 
 /**
@@ -138,7 +136,10 @@ public class MainActivity extends Activity {
     
     public void onEvent(CheckNewMessagesDoneEvent event) {
     	Log.d(TAG, "Checking for new messages - done");
-    	adapter.setNewMessageHolder(event.getNewMessagesHolder());
+    	for (Long userId : event.getNewMessagesByUserId().keySet()) {
+        	adapter.addUser(dbUserDao.getUser(userId));
+        }
+    	adapter.setNewMessageHolder(event.getNewMessagesByUserId());
     	stopLoading();
     }
 }
