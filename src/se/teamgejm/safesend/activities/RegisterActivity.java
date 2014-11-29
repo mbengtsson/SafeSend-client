@@ -44,7 +44,7 @@ public class RegisterActivity extends Activity {
     		"^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
     		+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
     
-    private static final String DISPLAYNAME_PATTERN = "^[A-Za-z0-9]+(?:[ ][A-Za-z0-9]+)*$";
+    private static final String DISPLAYNAME_PATTERN = "^[A-Za-z0-9]+(?:[ .][A-Za-z0-9]+)*$";
     
     private GenerateKeysResponseReciever genKeysReceiver;
 
@@ -141,8 +141,8 @@ public class RegisterActivity extends Activity {
     }
 
     private void registerUser (String publicKey) {
-        final String displayName = ((TextView) findViewById(R.id.register_display_name)).getText().toString();
-        final String email = ((TextView) findViewById(R.id.register_email)).getText().toString();
+        final String displayName = ((TextView) findViewById(R.id.register_display_name)).getText().toString().trim();
+        final String email = ((TextView) findViewById(R.id.register_email)).getText().toString().trim();
         final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
         
         Pattern emailPattern = Pattern.compile(EMAIL_PATTERN);
@@ -151,7 +151,7 @@ public class RegisterActivity extends Activity {
         Pattern displayNamePattern = Pattern.compile(DISPLAYNAME_PATTERN);
         Matcher displayNameMatcher = displayNamePattern.matcher(displayName);
         
-        if (displayName == null || displayName.length() < 4 || displayName.length() > 14) {
+        if (displayName == null || displayName.length() < 4 || displayName.length() > 29) {
         	Toast.makeText(getApplicationContext(), getString(R.string.register_fail_displayname), Toast.LENGTH_SHORT).show();
         	hideProgress();
         	return;

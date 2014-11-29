@@ -42,7 +42,7 @@
     <string name="register_button_register">Register me</string>
     <string name="register_title">Register new account</string>
     
-    <string name="register_fail_displayname">You must enter a name between 4 and 15 characters.</string>
+    <string name="register_fail_displayname">You must enter a name between 4 and 30 characters.</string>
     <string name="register_fail_displayname_char">Name contains illegal characters.</string>
     <string name="register_fail_email">You must enter a valid email.</string>
     <string name="register_fail_password">You must enter a password of at least 8 characters.</string>
