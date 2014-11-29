@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.util.Log;
 import org.spongycastle.util.encoders.Base64;
 import se.teamgejm.safesend.entities.Message;
-import se.teamgejm.safesend.pgp.PgpHelper;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -40,8 +39,8 @@ public class DecryptMessageIntentService extends IntentService {
         byte[] decodedEncryptedMessage = Base64.decode(message.getMessage().getBytes());
 
         // Decrypt the message
-        String messagePlainText = PgpHelper.decryptAndVerify(getApplicationContext(), keyIn, decodedEncryptedMessage);
-        message.setMessage(messagePlainText);
+        //String messagePlainText = PgpHelper.decryptAndVerify(getApplicationContext(), keyIn, decodedEncryptedMessage);
+        //message.setMessage(messagePlainText);
 
         // Send to broadcast receiver
         //        Intent broadcastIntent = new Intent();

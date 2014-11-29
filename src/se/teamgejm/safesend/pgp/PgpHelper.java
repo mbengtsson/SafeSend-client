@@ -126,7 +126,7 @@ public class PgpHelper {
      *
      * @return The decrypted message, null if an error occurred.
      */
-    public static String decryptAndVerify (Context context, InputStream publicKeyIn, byte[] encryptedMessage) {
+    public static String decryptAndVerify (Context context, InputStream publicKeyIn, byte[] encryptedMessage) throws PGPException {
         PgpHelper.context = context;
 
         String message = null;
@@ -168,6 +168,7 @@ public class PgpHelper {
         }
         catch (PGPException e) {
             Log.e(TAG, e.getMessage());
+            throw e;
         }
         catch (Exception e) {
             Log.e(TAG, e.getMessage());
