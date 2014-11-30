@@ -82,6 +82,8 @@ public class LoginActivity extends Activity {
         else if (CurrentUser.getInstance().getPassword() == null) {
             registerContainer.setVisibility(View.GONE);
             loginContainer.setVisibility(View.VISIBLE);
+            TextView loginLabel = (TextView) findViewById(R.id.login_label);
+            loginLabel.setText(getString(R.string.login_label) + " " + CurrentUser.getInstance().getDisplayName());
         }
         // The user is registered and have a password.
         else {
@@ -132,6 +134,7 @@ public class LoginActivity extends Activity {
         if (CurrentUser.getInstance().getPassword() == null) {
             CurrentUser.getInstance().setPassword(passwordField.getText().toString());
         }
+        hideProgress();
         final Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         this.finish();

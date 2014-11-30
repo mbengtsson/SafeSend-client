@@ -106,8 +106,6 @@ public class RegisterActivity extends Activity {
      * This will happen if the registration is successfully completed.
      */
     public void onEvent (final RegisterSuccessEvent event) {
-        hideProgress();
-
         // Get the password from the input field as its not returned by the server.
         final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
 
@@ -126,6 +124,7 @@ public class RegisterActivity extends Activity {
 
         dbUserDao.close();
 
+        hideProgress();
         this.finish();
     }
 
