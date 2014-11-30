@@ -21,6 +21,7 @@ import android.widget.ProgressBar;
 import de.greenrobot.event.EventBus;
 
 /**
+ * Lists messages between the application user and another user.
  * @author Emil Stjerneman
  */
 public class ListMessagesActivity extends Activity {

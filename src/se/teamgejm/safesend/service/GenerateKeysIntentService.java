@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.util.Log;
 
 /**
- * Service for generating keys.
+ * Service for generating keys pairs.
  * @author Gustav
  *
  */

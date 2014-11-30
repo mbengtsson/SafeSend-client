@@ -5,5 +5,5 @@ package se.teamgejm.safesend;
  */
 public final class SafeSendConstants {
 
-    public final static String API_URI = "https://192.168.0.102:8443/";
+    public final static String API_URI = "https://safesend.stjerneman.com/";
 }

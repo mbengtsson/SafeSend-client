@@ -1,7 +1,7 @@
 package se.teamgejm.safesend.entities;
 
 /**
- * User credentials used to hold credentials.
+ * User credentials used to hold application owner credentials.
  *
  * @author Emil Stjerneman
  */

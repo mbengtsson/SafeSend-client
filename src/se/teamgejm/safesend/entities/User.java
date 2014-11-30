@@ -4,6 +4,11 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
+/**
+ * A user of the application. See CurrentUser.class for the owner of the application.
+ * @author Gustav
+ *
+ */
 public class User implements Comparable<User>, Serializable {
 
     private static final long serialVersionUID = 1L;

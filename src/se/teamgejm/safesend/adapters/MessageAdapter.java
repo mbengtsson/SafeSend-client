@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
+ * Adapter for displaying messages.
  * @author Gustav
  */
 public class MessageAdapter extends BaseAdapter {

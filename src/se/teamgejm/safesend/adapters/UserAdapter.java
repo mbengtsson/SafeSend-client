@@ -18,11 +18,15 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 /**
+ * Adapter for displaying users.
  * @author Emil Stjerneman
  */
 @SuppressLint("UseSparseArrays")
 public class UserAdapter extends BaseAdapter {
 	
+	/**
+	 * Map of user id and the amount of new messages.
+	 */
 	private Map<Long, Integer> newMessagesByUserId = new HashMap<Long, Integer>();
 
     private Activity mContext;

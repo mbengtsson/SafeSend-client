@@ -22,6 +22,7 @@ import android.widget.ListView;
 import de.greenrobot.event.EventBus;
 
 /**
+ * Lists conversations between the application user and another user.
  * @author Gustav
  */
 public class MainActivity extends Activity {

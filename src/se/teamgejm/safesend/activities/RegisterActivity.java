@@ -128,6 +128,9 @@ public class RegisterActivity extends Activity {
         this.finish();
     }
 
+    /**
+     * Generates a new key pair and saving the private key as a file.
+     */
     private void generateKeyPairs () {
         final String email = ((TextView) findViewById(R.id.register_email)).getText().toString();
         final String password = ((TextView) findViewById(R.id.register_password)).getText().toString();
@@ -139,6 +142,10 @@ public class RegisterActivity extends Activity {
         startService(genKeyIntent);
     }
 
+    /**
+     * Sends the user credentials to the server for registration.
+     * @param publicKey The users public key
+     */
     private void registerUser (String publicKey) {
         final String displayName = ((TextView) findViewById(R.id.register_display_name)).getText().toString().trim();
         final String email = ((TextView) findViewById(R.id.register_email)).getText().toString().trim();

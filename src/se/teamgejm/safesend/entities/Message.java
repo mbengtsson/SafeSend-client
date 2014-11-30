@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 /**
+ * A simple text message from a user to a user.
  * @author Gustav
  */
 public class Message implements Serializable {

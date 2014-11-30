@@ -32,6 +32,7 @@ import se.teamgejm.safesend.rest.SendMessage;
 import se.teamgejm.safesend.service.EncryptMessageIntentService;
 
 /**
+ * View to send messages to other users.
  * @author Gustav
  */
 public class SendMessageActivity extends Activity {
@@ -176,7 +177,9 @@ public class SendMessageActivity extends Activity {
     public void onEvent (UserListSuccessEvent event) {
         adapter.clearUsers();
         for (final User user : event.getUsers()) {
-            adapter.addUser(user);
+        	if (!user.equals(CurrentUser.getInstance())) {
+                adapter.addUser(user);
+        	}
         }
         adapter.notifyDataSetChanged();
         hideProgress();
@@ -214,7 +217,7 @@ public class SendMessageActivity extends Activity {
 
 
     /**
-     * Sign and encrypt the message
+     * Signs and encrypt the message.
      */
     private void signAndEncrypt (byte[] receiverPublicKey) {
         statusMessage.setText(R.string.status_encrypting);
@@ -233,6 +236,9 @@ public class SendMessageActivity extends Activity {
         registerReceiver(encryptMessageResponseReceiver, filter);
     }
 
+    /**
+     * Fetches the public key of the receiver from the server.
+     */
     private void getReceiverPublicKey () {
         showProgress();
         Log.d(TAG, "Getting public key");
@@ -259,6 +265,7 @@ public class SendMessageActivity extends Activity {
     }
 
     /**
+     * Receives the encrypted message and sends it to the server.
      * @author Gustav
      */
     public class EncryptMessageResponseReceiver extends BroadcastReceiver {
