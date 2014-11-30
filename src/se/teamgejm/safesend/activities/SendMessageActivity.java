@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import de.greenrobot.event.EventBus;
 import org.spongycastle.util.encoders.Base64;
@@ -97,6 +99,15 @@ public class SendMessageActivity extends Activity {
 
         messageText = (TextView) findViewById(R.id.message_text);
         messageText.setMovementMethod(new ScrollingMovementMethod());
+        
+        messageText.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		        imm.showSoftInput(messageText, InputMethodManager.SHOW_FORCED);
+			}
+		});
 
         dbMessageDao = new DbMessageDao(this);
         dbMessageDao.open();

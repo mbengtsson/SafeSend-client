@@ -96,8 +96,12 @@ public class RegisterActivity extends Activity {
      */
     public void onEvent (final RegisterFailedEvent event) {
         hideProgress();
-        // Just tell the user that something went wrong.
-        Toast.makeText(this, event.getError().getMessage(), Toast.LENGTH_LONG).show();
+    	if (event.getError().getMessage().contains("409")) {
+            Toast.makeText(this, getString(R.string.register_fail_already_exist), Toast.LENGTH_LONG).show();
+    	} else {
+            // Just tell the user that something went wrong.
+            Toast.makeText(this, event.getError().getMessage(), Toast.LENGTH_LONG).show();
+    	}
     }
 
     /**

@@ -46,6 +46,7 @@
     <string name="register_fail_displayname_char">Name contains illegal characters.</string>
     <string name="register_fail_email">You must enter a valid email.</string>
     <string name="register_fail_password">You must enter a password of at least 8 characters.</string>
+    <string name="register_fail_already_exist">That username or emailadress is already registered.</string>
     
     <string name="no_account">No account yet?</string>
     <string name="login_label">Welcome back</string>
