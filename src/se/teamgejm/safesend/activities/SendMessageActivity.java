@@ -188,7 +188,7 @@ public class SendMessageActivity extends Activity {
     public void onEvent (UserListSuccessEvent event) {
         adapter.clearUsers();
         for (final User user : event.getUsers()) {
-        	if (!user.equals(CurrentUser.getInstance())) {
+        	if (user.getUserId() != (CurrentUser.getInstance().getUserId())) {
                 adapter.addUser(user);
         	}
         }
