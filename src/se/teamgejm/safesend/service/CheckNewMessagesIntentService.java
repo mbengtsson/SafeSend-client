@@ -15,7 +15,7 @@ import android.content.Intent;
 import de.greenrobot.event.EventBus;
 
 /**
- * 
+ * Service for checking new incoming messages.
  * @author Gustav
  *
  */

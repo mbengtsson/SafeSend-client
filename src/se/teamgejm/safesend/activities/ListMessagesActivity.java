@@ -9,6 +9,8 @@ import se.teamgejm.safesend.events.MessageFetchingDoneEvent;
 import se.teamgejm.safesend.service.FetchMessagesIntentService;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -89,7 +91,7 @@ public class ListMessagesActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu (Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.conversation, menu);
         return true;
     }
 
@@ -98,6 +100,27 @@ public class ListMessagesActivity extends Activity {
         int id = item.getItemId();
 
         switch (id) {
+        	case R.id.action_delete_conversation:
+        		new AlertDialog.Builder(this)
+        	    .setTitle(getString(R.string.prompt_title_delete_conversation))
+        	    .setMessage(getString(R.string.prompt_message_delete_conversation))
+        	    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        	        public void onClick(DialogInterface dialog, int whichButton) {
+        	            DbMessageDao messageDao = new DbMessageDao(getApplicationContext());
+        	            messageDao.open();
+        	            
+        	            messageDao.deleteConversationWithUser(user.getUserId());
+        	            
+        	            messageDao.close();
+        	            
+        	            startLoading();
+        	        }
+        	    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        	        public void onClick(DialogInterface dialog, int whichButton) {
+        	            // Do nothing.
+        	        }
+        	    }).show();
+        		return true;
             case R.id.action_send_new_message:
                 Intent intent = new Intent(this, SendMessageActivity.class);
                 intent.putExtra(SendMessageActivity.INTENT_RECEIVER, user);

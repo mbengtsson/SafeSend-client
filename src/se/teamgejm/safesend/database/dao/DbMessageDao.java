@@ -7,6 +7,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import se.teamgejm.safesend.database.SafeSendSqlHelper;
+import se.teamgejm.safesend.entities.CurrentUser;
 import se.teamgejm.safesend.entities.Message;
 import se.teamgejm.safesend.entities.User;
 
@@ -47,6 +48,15 @@ public class DbMessageDao {
         Message newMessage = cursorToMessage(cursor);
         cursor.close();
         return newMessage;
+    }
+    
+    public void deleteConversationWithUser(Long userId) {
+    	Log.d("DbMessageDao", "deleteConversationWithUser");
+    	
+    	database.delete("messages", "receiverId = ?" + " AND senderId = ?", 
+    			new String[]{String.valueOf(CurrentUser.getInstance().getUserId()), String.valueOf(userId)});
+    	database.delete("messages", "senderId = ?" + " AND receiverId = ?", 
+    			new String[]{String.valueOf(CurrentUser.getInstance().getUserId()), String.valueOf(userId)});
     }
 
     public List<Message> getAllMessage (long userId) {

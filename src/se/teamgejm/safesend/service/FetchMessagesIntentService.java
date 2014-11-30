@@ -20,7 +20,7 @@ import android.util.Log;
 import de.greenrobot.event.EventBus;
 
 /**
- * 
+ * Service for fetching new messages and decrypting them.
  * @author Gustav
  *
  */
