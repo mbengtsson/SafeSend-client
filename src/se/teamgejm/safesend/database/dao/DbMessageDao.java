@@ -1,10 +1,10 @@
 package se.teamgejm.safesend.database.dao;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 import se.teamgejm.safesend.database.SafeSendSqlHelper;
 import se.teamgejm.safesend.entities.CurrentUser;
@@ -18,6 +18,8 @@ import java.util.List;
  * @author Emil Stjerneman
  */
 public class DbMessageDao {
+
+    private final static String TABLE_NAME = "messages";
 
     private SQLiteDatabase database;
     private SafeSendSqlHelper sqlHelper;
@@ -36,34 +38,35 @@ public class DbMessageDao {
 
     public Message addMessage (Message message) {
         Log.d("DbMessageDao", "addMessage");
-        ContentValues values = new ContentValues();
-        values.put("senderId", message.getSender().getUserId());
-        values.put("receiverId", message.getReceiver().getUserId());
-        values.put("message", message.getMessage());
-        values.put("timestamp", message.getTimeStamp());
 
-        long insertId = database.insert("messages", null, values);
-        Cursor cursor = database.rawQuery("SELECT m._id as mid, m.* FROM messages m WHERE m._id = ?", new String[]{String.valueOf(insertId)});
+        final String query = "INSERT INTO " + TABLE_NAME + " (senderId, receiverId, message, timestamp) VALUES (?,?,?,?)";
+        final SQLiteStatement sqLiteStatement = database.compileStatement(query);
+        sqLiteStatement.bindLong(1, message.getSender().getUserId());
+        sqLiteStatement.bindLong(2, message.getReceiver().getUserId());
+        sqLiteStatement.bindString(3, message.getMessage());
+        sqLiteStatement.bindLong(4, message.getTimeStamp());
+        long insertId = sqLiteStatement.executeInsert();
+
+        Cursor cursor = database.query(TABLE_NAME, new String[]{"_id as mid", "*"}, "_id = ?", new String[]{String.valueOf(insertId)}, null, null, null);
         cursor.moveToFirst();
         Message newMessage = cursorToMessage(cursor);
         cursor.close();
         return newMessage;
     }
-    
-    public void deleteConversationWithUser(Long userId) {
-    	Log.d("DbMessageDao", "deleteConversationWithUser");
-    	
-    	database.delete("messages", "receiverId = ?" + " AND senderId = ?", 
-    			new String[]{String.valueOf(CurrentUser.getInstance().getUserId()), String.valueOf(userId)});
-    	database.delete("messages", "senderId = ?" + " AND receiverId = ?", 
-    			new String[]{String.valueOf(CurrentUser.getInstance().getUserId()), String.valueOf(userId)});
+
+    public void deleteConversationWithUser (Long userId) {
+        Log.d("DbMessageDao", "deleteConversationWithUser");
+
+        database.delete(TABLE_NAME, "receiverId = ?" + " AND senderId = ?",
+                new String[]{String.valueOf(CurrentUser.getInstance().getUserId()), String.valueOf(userId)});
+        database.delete(TABLE_NAME, "senderId = ?" + " AND receiverId = ?",
+                new String[]{String.valueOf(CurrentUser.getInstance().getUserId()), String.valueOf(userId)});
     }
 
     public List<Message> getAllMessage (long userId) {
         Log.d("DbMessageDao", "getAllMessage");
         List<Message> messages = new ArrayList<>();
 
-        //Cursor cursor = database.rawQuery("SELECT m._id as mid, m.*, s._id sid, s.userId suserId, s.email semail, s.displayName sdisplayName, s.publicKey spublicKey, r._id rid, r.userId ruserId, r.email remail, r.displayName rdisplayName, r.publicKey rpublicKey FROM messages m INNER JOIN users s ON m.senderId = s.userId INNER JOIN users r ON m.receiverId = r.userId", new String[]{String.valueOf(userId), String.valueOf(userId)});
         Cursor cursor = database.rawQuery("SELECT m._id as mid, m.*, s._id sid, s.userId suserId, s.email semail, s.displayName sdisplayName, s.publicKey spublicKey FROM messages m INNER JOIN users s ON m.senderId = s.userId WHERE m.senderId = ? OR m.receiverId = ? ORDER BY m.timestamp DESC", new String[]{String.valueOf(userId), String.valueOf(userId)});
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
