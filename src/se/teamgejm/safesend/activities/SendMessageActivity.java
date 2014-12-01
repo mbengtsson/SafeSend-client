@@ -82,7 +82,7 @@ public class SendMessageActivity extends Activity {
         statusMessage = (TextView) findViewById(R.id.send_status);
 
         userSprinner = (Spinner) findViewById(R.id.userSpinner);
-        adapter = new UserAdapter(this);
+        adapter = new UserAdapter(this, true);
         userSprinner.setAdapter(adapter);
         userSprinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

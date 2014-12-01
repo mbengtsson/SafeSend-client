@@ -49,7 +49,7 @@ public class MainActivity extends Activity {
 
         userListView = (ListView) findViewById(R.id.userListView);
         
-        adapter = new UserAdapter(this);
+        adapter = new UserAdapter(this, false);
         userListView.setAdapter(adapter);
 
         userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

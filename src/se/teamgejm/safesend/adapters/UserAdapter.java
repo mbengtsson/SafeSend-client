@@ -28,6 +28,8 @@ public class UserAdapter extends BaseAdapter {
 	 * Map of user id and the amount of new messages.
 	 */
 	private Map<Long, Integer> newMessagesByUserId = new HashMap<Long, Integer>();
+	
+	private boolean showEmail;
 
     private Activity mContext;
 
@@ -44,9 +46,10 @@ public class UserAdapter extends BaseAdapter {
         TextView username;
     }
 
-    public UserAdapter (Activity context) {
+    public UserAdapter (Activity context, boolean showEmail) {
         super();
         mContext = context;
+        this.showEmail = showEmail;
         mItems = new ArrayList<>();
     }
 
@@ -108,7 +111,11 @@ public class UserAdapter extends BaseAdapter {
         	convertView.setBackgroundResource(R.color.green);
         } else {
         	holder.username.setTypeface(Typeface.DEFAULT);
-            holder.username.setText(user.getDisplayName());
+        	if (showEmail) {
+            	holder.username.setText(user.getDisplayName() + " (" + user.getEmail() + ")");
+        	} else {
+            	holder.username.setText(user.getDisplayName());
+        	}
         	convertView.setBackgroundResource(R.color.lightgreen);
         }
 
