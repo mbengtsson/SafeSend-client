@@ -114,7 +114,7 @@ public class ListMessagesActivity extends Activity {
         	            
         	            messageDao.close();
         	            
-        	            startLoading();
+        	            getParent().finish();
         	        }
         	    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
         	        public void onClick(DialogInterface dialog, int whichButton) {

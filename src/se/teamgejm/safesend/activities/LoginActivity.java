@@ -88,6 +88,7 @@ public class LoginActivity extends Activity {
         // The user is registered and have a password.
         else {
             showProgress();
+            registerContainer.setVisibility(View.GONE);
             ValidateCredentials.call(new ValidateCredentialsRequest(CurrentUser.getInstance().getEmail(), CurrentUser.getInstance().getPassword()));
         }
     }
